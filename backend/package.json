@@ -4,6 +4,7 @@
   "description": "",
   "main": "server.ts",
   "scripts": {
+    "build": "next build && cp erc20.txt output/erc20.txt && cp invoice-minter.txt output/invoice-minter.txt",
     "start": "ts-node src/server.ts",
     "test": "echo \"Error: no test specified\" && exit 1"
   },

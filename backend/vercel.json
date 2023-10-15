@@ -1,4 +1,6 @@
 {
+  "outputDirectory": "build",
+  "buildCommand": "next build",
   "builds": [
     {
       "src": "src/server.ts",
