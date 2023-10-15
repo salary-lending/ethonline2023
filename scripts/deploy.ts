@@ -5,7 +5,7 @@ async function main() {
   const [deployer] = await ethers.getSigners();
   console.log(`Deploying contracts with the account: ${deployer.address}`);
 
-  const ERC20TokenFactory = await ethers.getContractFactory("ERC20Token");
+  const ERC20TokenFactory = await ethers.getContractFactory("InvoiceToken");
   const erc20token = await ERC20TokenFactory.deploy();
   await erc20token.waitForDeployment();
   console.log(
@@ -18,7 +18,9 @@ async function main() {
     await erc20token.getAddress()
   );
 
-  const InvoiceMinterFactory = await ethers.getContractFactory("InvoiceMinter");
+  const InvoiceMinterFactory = await ethers.getContractFactory(
+    "InvoiceFinancer"
+  );
   const invoiceMinter = await InvoiceMinterFactory.deploy(
     await erc20token.getAddress()
   );

@@ -22,10 +22,11 @@ describe("InvoiceFinancer", function () {
     it("Should mint 90% of invoice amount to the financier", async function () {
       const invoiceAmount = ethers.parseEther("10"); // 10 ethers as an example
       const expectedMintAmount = ethers.parseEther("10"); // change to 90 to have90% of 10
+      const description = "Invoice Description 1";
 
       await invoiceFinancer
         .connect(addr1)
-        .financeInvoice("INV001", invoiceAmount);
+        .financeInvoice("INV001", description, invoiceAmount);
       const balance = await invoiceToken.balanceOf(addr1.address);
 
       expect(balance).to.equal(expectedMintAmount);
@@ -35,11 +36,12 @@ describe("InvoiceFinancer", function () {
   describe("Paying an invoice", function () {
     it("Should allow repayment of 100% invoice amount", async function () {
       const invoiceAmount = ethers.parseEther("10");
+      const description = "Invoice Description 1";
 
       // Address1 finances the invoice
       await invoiceFinancer
         .connect(addr1)
-        .financeInvoice("INV001", invoiceAmount);
+        .financeInvoice("INV001", description, invoiceAmount);
       // Address2 repays the invoice
       const paymentAmount = ethers.parseEther("10");
       await invoiceToken.connect(owner).mint(addr2.address, paymentAmount);

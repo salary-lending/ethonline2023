@@ -23,33 +23,51 @@ contract InvoiceFinancer {
         Financed,
         Paid
     }
+
     struct Invoice {
         uint256 amount;
         InvoiceStatus status;
+        string details;
         address financedBy;
     }
 
+    Invoice[] public invoicesArray;
+    mapping(string => uint256) public invoiceIdToIndex;
     mapping(string => Invoice) public invoices;
+
+    event InvoiceFinanced(string invoiceId, string details, uint256 amount);
 
     constructor(address _invoiceTokenAddress) {
         invoiceToken = InvoiceToken(_invoiceTokenAddress);
     }
 
-    function financeInvoice(string memory invoiceId, uint256 amount) external {
+    function financeInvoice(
+        string memory invoiceId,
+        string memory details,
+        uint256 amount
+    ) external {
         require(
             invoices[invoiceId].status == InvoiceStatus.None,
             "Invoice already exists"
         );
+
         // uint256 mintAmount = (amount * 90) / 100; // Mint 90% of the invoice amount
         uint256 mintAmount = amount;
 
-        invoices[invoiceId] = Invoice({
-            amount: amount,
+        Invoice memory newInvoice = Invoice({
+            amount: mintAmount,
             status: InvoiceStatus.Financed,
+            details: details,
             financedBy: msg.sender
         });
 
+        invoices[invoiceId] = newInvoice;
+        invoicesArray.push(newInvoice);
+
+        invoiceIdToIndex[invoiceId] = invoicesArray.length;
+
         invoiceToken.mint(msg.sender, mintAmount);
+        emit InvoiceFinanced(invoiceId, details, mintAmount);
     }
 
     function payInvoice(string memory invoiceId, uint256 amount) external {
@@ -63,7 +81,10 @@ contract InvoiceFinancer {
         );
 
         invoiceToken.transferFrom(msg.sender, address(this), amount);
-        // invoiceToken.burn(msg.sender, amount);
         invoices[invoiceId].status = InvoiceStatus.Paid;
+    }
+
+    function getInvoicesCount() public view returns (uint256) {
+        return invoicesArray.length;
     }
 }
