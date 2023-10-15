@@ -13,7 +13,7 @@ const deel_key: string = process.env.DEEL_KEY!;
 const web3storage_key: string = process.env.WEB3STORAGE_KEY!;
 
 const app = express();
-const PORT = 3000;
+const PORT = process.env.PORT || 3000;
 
 // const provider = new ethers.providers.JsonRpcProvider("http://localhost:8545");
 const contractABI: any[] = [
