@@ -129,7 +129,7 @@ app.post("/invoice/mint", async (req, res) => {
   }
 });
 
-app.get("/minted-invoices", async (req, res) => {
+app.get("/invoice/minted", async (req, res) => {
   try {
     const invoiceMinterContract = new ethers.Contract(
       INVOICE_MINTER_ADDRESS,
