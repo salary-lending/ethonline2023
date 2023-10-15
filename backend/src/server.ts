@@ -76,6 +76,41 @@ app.get("/deel/invoice", async (req: Request, res: Response) => {
   }
 });
 
+app.post("/create-invoice", async (req, res) => {
+  try {
+    const { invoiceId, details, amount } = req.body;
+
+    const provider = new ethers.JsonRpcProvider("http://localhost:8545");
+    const wallet = new ethers.Wallet("YOUR_PRIVATE_KEY", provider);
+
+    // Replace with deployed contract address and ABI
+    const minterAddress = "YOUR_DEPLOYED_MINTER_CONTRACT_ADDRESS";
+    const minterABI = [
+      /* YOUR_MINTER_CONTRACT_ABI */
+    ];
+
+    const contract = new ethers.Contract(minterAddress, minterABI, wallet);
+
+    const tx = await contract.createInvoiceAndMintToken(
+      invoiceId,
+      details,
+      amount
+    );
+
+    await tx.wait();
+
+    res.json({
+      status: "success",
+      message: "Invoice created and tokens minted successfully!",
+    });
+  } catch (error) {
+    res.status(500).json({
+      status: "error",
+      message: error,
+    });
+  }
+});
+
 // app.post("/create-invoice", async (req: Request, res: Response) => {
 //   const { invoiceId, details, amount } = req.body;
 

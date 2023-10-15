@@ -1,21 +1,21 @@
-import { ethers } from "hardhat";
+import { run, ethers } from "hardhat";
 
 async function main() {
-  const currentTimestampInSeconds = Math.round(Date.now() / 1000);
-  const unlockTime = currentTimestampInSeconds + 60;
+  const [deployer] = await ethers.getSigners();
+  console.log(`Deploying contracts with the account: ${deployer.address}`);
 
-  const lockedAmount = ethers.parseEther("0.001");
+  const ERC20TokenFactory = await ethers.getContractFactory("ERC20Token");
+  const erc20token = await ERC20TokenFactory.deploy();
+  await erc20token.waitForDeployment();
+  console.log(`ERC20Token contract deployed at: ${erc20token.getAddress()}`);
 
-  const lock = await ethers.deployContract("Lock", [unlockTime], {
-    value: lockedAmount,
-  });
-
-  await lock.waitForDeployment();
-
+  const InvoiceMinterFactory = await ethers.getContractFactory("InvoiceMinter");
+  const invoiceMinter = await InvoiceMinterFactory.deploy(
+    erc20token.getAddress()
+  );
+  await invoiceMinter.waitForDeployment();
   console.log(
-    `Lock with ${ethers.formatEther(
-      lockedAmount
-    )}ETH and unlock timestamp ${unlockTime} deployed to ${lock.target}`
+    `InvoiceMinter contract deployed at: ${invoiceMinter.getAddress}`
   );
 }
 
