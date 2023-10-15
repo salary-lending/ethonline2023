@@ -1,89 +1,69 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-interface IERC20 {
-    function mint(address to, uint256 amount) external;
+import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
+
+contract InvoiceToken is ERC20 {
+    constructor() ERC20("InvoiceToken", "INV") {}
+
+    function mint(address to, uint256 amount) external {
+        _mint(to, amount);
+    }
+
+    function burn(address account, uint256 amount) external {
+        _burn(account, amount);
+    }
 }
 
-contract InvoiceMinter {
-    address public tokenAddress;
+contract InvoiceFinancer {
+    InvoiceToken public invoiceToken;
 
-    event InvoiceCreated(string invoiceId, string details, uint256 amount);
-
-    // Constructor to initialize the token's address
-    constructor(address _tokenAddress) {
-        tokenAddress = _tokenAddress;
+    enum InvoiceStatus {
+        None,
+        Financed,
+        Paid
     }
-
     struct Invoice {
-        string invoiceId;
-        string details;
         uint256 amount;
+        InvoiceStatus status;
+        address financedBy;
     }
 
-    Invoice[] public invoicesArray;
-    mapping(string => uint256) public invoiceIdToIndex; // Maps an invoiceId to its index in the array
+    mapping(string => Invoice) public invoices;
 
-    mapping(string => Invoice) public invoices; // Maps an invoiceId to its Invoice struct
+    constructor(address _invoiceTokenAddress) {
+        invoiceToken = InvoiceToken(_invoiceTokenAddress);
+    }
 
-    function createInvoiceAndMintToken(
-        string memory _invoiceId,
-        string memory _details,
-        uint256 _amount
-    ) public {
-        // Ensure the invoice doesn't already exist
+    function financeInvoice(string memory invoiceId, uint256 amount) external {
         require(
-            bytes(invoices[_invoiceId].invoiceId).length == 0,
-            "Invoice ID already exists"
+            invoices[invoiceId].status == InvoiceStatus.None,
+            "Invoice already exists"
         );
+        // uint256 mintAmount = (amount * 90) / 100; // Mint 90% of the invoice amount
+        uint256 mintAmount = amount;
 
-        // Create the invoice
-        Invoice memory newInvoice = Invoice({
-            invoiceId: _invoiceId,
-            details: _details,
-            amount: _amount
+        invoices[invoiceId] = Invoice({
+            amount: amount,
+            status: InvoiceStatus.Financed,
+            financedBy: msg.sender
         });
 
-        invoices[_invoiceId] = newInvoice;
-        invoicesArray.push(
-            Invoice({invoiceId: _invoiceId, details: _details, amount: _amount})
+        invoiceToken.mint(msg.sender, mintAmount);
+    }
+
+    function payInvoice(string memory invoiceId, uint256 amount) external {
+        require(
+            invoices[invoiceId].status == InvoiceStatus.Financed,
+            "Invoice not financed or already repaid"
+        );
+        require(
+            invoices[invoiceId].amount == amount,
+            "Amount has to equal invoice amount"
         );
 
-        invoiceIdToIndex[_invoiceId] = invoicesArray.length; // Update the mapping with the index of the newly created invoice
-
-        // Mint the token
-        IERC20(tokenAddress).mint(msg.sender, _amount);
-        emit InvoiceCreated(_invoiceId, _details, _amount);
+        invoiceToken.transferFrom(msg.sender, address(this), amount);
+        // invoiceToken.burn(msg.sender, amount);
+        invoices[invoiceId].status = InvoiceStatus.Paid;
     }
-
-    function getInvoicesCount() public view returns (uint256) {
-        return invoicesArray.length;
-    }
-}
-
-contract ERC20Token is IERC20 {
-    string public name = "InvoiceToken";
-    string public symbol = "INV";
-    uint8 public decimals = 18;
-    uint256 public totalSupply;
-
-    mapping(address => uint256) public balances;
-
-    address public admin;
-
-    constructor() {
-        admin = msg.sender;
-    }
-
-    // modifier onlyAdmin() {
-    //     require(msg.sender == admin, "Only admin can mint");
-    //     _;
-    // }
-
-    function mint(address to, uint256 amount) external override {
-        totalSupply += amount;
-        balances[to] += amount;
-    }
-
-    //... other ERC20 methods
 }
