@@ -1,4 +1,5 @@
 import { run, ethers } from "hardhat";
+const fs = require("fs");
 
 async function main() {
   const [deployer] = await ethers.getSigners();
@@ -10,6 +11,12 @@ async function main() {
   console.log(
     `ERC20Token contract deployed at: ${await erc20token.getAddress()}`
   );
+  // Save the contract address to a file
+
+  fs.writeFileSync(
+    "./deployments/localhost/erc20.txt",
+    await erc20token.getAddress()
+  );
 
   const InvoiceMinterFactory = await ethers.getContractFactory("InvoiceMinter");
   const invoiceMinter = await InvoiceMinterFactory.deploy(
@@ -18,6 +25,11 @@ async function main() {
   await invoiceMinter.waitForDeployment();
   console.log(
     `InvoiceMinter contract deployed at: ${await invoiceMinter.getAddress()}`
+  );
+  // Save the contract address to a file
+  fs.writeFileSync(
+    "./deployments/localhost/invoice-minter.txt",
+    await invoiceMinter.getAddress()
   );
 }
 
