@@ -4,13 +4,14 @@ import dotenv from "dotenv";
 import axios from "axios";
 import { Web3Storage, getFilesFromPath } from "web3.storage";
 import fs from "fs";
+dotenv.config();
 
-const deel_key = process.env["DEEL_KEY"];
-const web3storage_key = process.env["WEB3STORAGE_KEY"];
-const DEEL_INVOICE_URL =
+const DEEL_INVOICE_URL: string =
   "https://api-staging.letsdeel.com/rest/v1/contracts/nw9z5ww/invoice-adjustments";
 
-dotenv.config();
+const deel_key: string = process.env.DEEL_KEY!;
+const web3storage_key: string = process.env.WEB3STORAGE_KEY!;
+
 const app = express();
 const PORT = 3000;
 
@@ -26,7 +27,7 @@ const contractAddress = "YOUR_CONTRACT_ADDRESS";
 app.use(express.json());
 
 // Construct with token and endpoint
-const client = new Web3Storage({ token: web3storage_key as string });
+const client = new Web3Storage({ token: web3storage_key });
 
 const getData = (latest_invoice) => {
   const name = latest_invoice.contract.title;
@@ -46,7 +47,8 @@ app.get("/", (req, res) => {
   res.send("Salary API is running");
 });
 
-app.get("/deel/invoice", async (req, res) => {
+app.get("/deel/invoice", async (req: Request, res: Response) => {
+  console.log("Start fetching data from Deel");
   try {
     const deelResponse = await axios.get(DEEL_INVOICE_URL, {
       headers: {
@@ -54,14 +56,14 @@ app.get("/deel/invoice", async (req, res) => {
       },
     });
     const latest_invoice = deelResponse.data.data[0];
-    const invoice_id = getData(latest_invoice);
+    const invoice_id = getData(latest_invoice); // Make sure getData is defined
     const file_name = `${invoice_id}.json`;
 
     await fs.writeFileSync(
       `/tmp/${file_name}`,
       JSON.stringify(latest_invoice, null, 2)
     );
-    const files = await getFilesFromPath(`/tmp/${file_name}`);
+    const files = await getFilesFromPath(`/tmp/${file_name}`); // Make sure getFilesFromPath is defined
     const cid = await client.put(files);
     fs.unlinkSync(`/tmp/${file_name}`);
 
