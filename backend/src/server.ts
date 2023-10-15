@@ -8,19 +8,34 @@ dotenv.config();
 
 const DEEL_INVOICE_URL: string =
   "https://api-staging.letsdeel.com/rest/v1/contracts/nw9z5ww/invoice-adjustments";
-
+const ERC20Address: string = "0xa513E6E4b8f2a923D98304ec87F64353C4D5C853";
+const INVOICE_MINTER_ADDRESS: string =
+  "0x2279B7A0a67DB372996a5FaB50D91eAA73d2eBe6";
 const deel_key: string = process.env.DEEL_KEY!;
 const web3storage_key: string = process.env.WEB3STORAGE_KEY!;
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// const provider = new ethers.providers.JsonRpcProvider("http://localhost:8545");
+const provider = new ethers.JsonRpcProvider("http://127.0.0.1:8545");
+const wallet = new ethers.Wallet(
+  "0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80",
+  provider
+);
 const contractABI: any[] = [
   /* ...your contract ABI here... */
 ];
 const contractAddress = "YOUR_CONTRACT_ADDRESS";
 
+const erc20ABI = fs.readFileSync(
+  "../deployments/localhost/erc20ABI.json",
+  "utf8"
+);
+const invoiceMinterABI = fs.readFileSync(
+  "../deployments/localhost/invoiceMinterABI.json",
+  "utf8"
+);
+const invoiceMinterAddress = INVOICE_MINTER_ADDRESS;
 // const signer = provider.getSigner();
 // const contract = new ethers.Contract(contractAddress, contractABI, signer);
 
@@ -80,18 +95,12 @@ app.post("/create-invoice", async (req, res) => {
   try {
     const { invoiceId, details, amount } = req.body;
 
-    const provider = new ethers.JsonRpcProvider("http://localhost:8545");
-    const wallet = new ethers.Wallet("YOUR_PRIVATE_KEY", provider);
-
-    // Replace with deployed contract address and ABI
-    const minterAddress = "YOUR_DEPLOYED_MINTER_CONTRACT_ADDRESS";
-    const minterABI = [
-      /* YOUR_MINTER_CONTRACT_ABI */
-    ];
-
-    const contract = new ethers.Contract(minterAddress, minterABI, wallet);
-
-    const tx = await contract.createInvoiceAndMintToken(
+    const invoiceMinterContract = new ethers.Contract(
+      invoiceMinterAddress,
+      invoiceMinterABI,
+      wallet
+    );
+    const tx = await invoiceMinterContract.createInvoiceAndMintToken(
       invoiceId,
       details,
       amount
@@ -102,11 +111,57 @@ app.post("/create-invoice", async (req, res) => {
     res.json({
       status: "success",
       message: "Invoice created and tokens minted successfully!",
+      mintedTokens: amount,
     });
-  } catch (error) {
+  } catch (error: any) {
+    console.log("Error", error);
     res.status(500).json({
       status: "error",
-      message: error,
+      message: error.message,
+    });
+  }
+});
+
+app.get("/invoices/minted", async (req, res) => {
+  try {
+    const invoiceMinterContract = new ethers.Contract(
+      invoiceMinterAddress,
+      invoiceMinterABI,
+      wallet
+    );
+    const tx = await invoiceMinterContract.invoices("ID1");
+    console.log("tx", tx);
+    console.log("tx", tx.toString());
+
+    await tx.wait();
+
+    res.json({
+      status: "success",
+      message: "Invoice created and tokens minted successfully!",
+      mintedTokens: tx.toString(),
+    });
+  } catch (error: any) {
+    console.log("Error", error);
+    res.status(500).json({
+      status: "error",
+      message: error.message,
+    });
+  }
+});
+
+app.get("/invoice-tokens/balance", async (req, res) => {
+  try {
+    const erc20Contract = new ethers.Contract(ERC20Address, erc20ABI, wallet);
+    const erc20Balance = await erc20Contract.totalSupply();
+
+    res.json({
+      totalBalance: erc20Balance.toString(),
+    });
+  } catch (error: any) {
+    console.log("Error", error);
+    res.status(500).json({
+      status: "error",
+      message: error.message,
     });
   }
 });
