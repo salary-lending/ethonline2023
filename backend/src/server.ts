@@ -98,7 +98,7 @@ app.get("/deel/invoice", async (req: Request, res: Response) => {
   }
 });
 
-app.post("/create-invoice", async (req, res) => {
+app.post("/invoice/mint", async (req, res) => {
   try {
     const { invoiceId, details, amount } = req.body;
 
