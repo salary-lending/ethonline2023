@@ -7,15 +7,17 @@ async function main() {
   const ERC20TokenFactory = await ethers.getContractFactory("ERC20Token");
   const erc20token = await ERC20TokenFactory.deploy();
   await erc20token.waitForDeployment();
-  console.log(`ERC20Token contract deployed at: ${erc20token.getAddress()}`);
+  console.log(
+    `ERC20Token contract deployed at: ${await erc20token.getAddress()}`
+  );
 
   const InvoiceMinterFactory = await ethers.getContractFactory("InvoiceMinter");
   const invoiceMinter = await InvoiceMinterFactory.deploy(
-    erc20token.getAddress()
+    await erc20token.getAddress()
   );
   await invoiceMinter.waitForDeployment();
   console.log(
-    `InvoiceMinter contract deployed at: ${invoiceMinter.getAddress}`
+    `InvoiceMinter contract deployed at: ${await invoiceMinter.getAddress()}`
   );
 }
 
