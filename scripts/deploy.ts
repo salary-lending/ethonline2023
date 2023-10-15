@@ -14,7 +14,7 @@ async function main() {
   // Save the contract address to a file
 
   fs.writeFileSync(
-    "./deployments/localhost/erc20.txt",
+    "./backend/artifacts/erc20.txt",
     await erc20token.getAddress()
   );
 
@@ -30,7 +30,7 @@ async function main() {
   );
   // Save the contract address to a file
   fs.writeFileSync(
-    "./deployments/localhost/invoice-minter.txt",
+    "./backend/artifacts//invoice-minter.txt",
     await invoiceMinter.getAddress()
   );
 }
