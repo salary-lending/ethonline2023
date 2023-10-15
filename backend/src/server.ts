@@ -107,7 +107,7 @@ app.post("/invoice/mint", async (req, res) => {
       invoiceMinterABI,
       wallet
     );
-    const tx = await invoiceMinterContract.createInvoiceAndMintToken(
+    const tx = await invoiceMinterContract.financeInvoice(
       invoiceId,
       details,
       amount
