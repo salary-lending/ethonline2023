@@ -8,6 +8,8 @@ interface IERC20 {
 contract InvoiceMinter {
     address public tokenAddress;
 
+    event InvoiceCreated(string invoiceId, string details, uint256 amount);
+
     // Constructor to initialize the token's address
     constructor(address _tokenAddress) {
         tokenAddress = _tokenAddress;
@@ -43,6 +45,7 @@ contract InvoiceMinter {
 
         // Mint the token
         IERC20(tokenAddress).mint(msg.sender, _amount);
+        emit InvoiceCreated(_invoiceId, _details, _amount);
     }
 }
 
