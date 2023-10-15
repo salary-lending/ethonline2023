@@ -21,7 +21,10 @@ contract InvoiceMinter {
         uint256 amount;
     }
 
-    mapping(string => Invoice) public invoices;
+    Invoice[] public invoicesArray;
+    mapping(string => uint256) public invoiceIdToIndex; // Maps an invoiceId to its index in the array
+
+    mapping(string => Invoice) public invoices; // Maps an invoiceId to its Invoice struct
 
     function createInvoiceAndMintToken(
         string memory _invoiceId,
@@ -42,10 +45,19 @@ contract InvoiceMinter {
         });
 
         invoices[_invoiceId] = newInvoice;
+        invoicesArray.push(
+            Invoice({invoiceId: _invoiceId, details: _details, amount: _amount})
+        );
+
+        invoiceIdToIndex[_invoiceId] = invoicesArray.length; // Update the mapping with the index of the newly created invoice
 
         // Mint the token
         IERC20(tokenAddress).mint(msg.sender, _amount);
         emit InvoiceCreated(_invoiceId, _details, _amount);
+    }
+
+    function getInvoicesCount() public view returns (uint256) {
+        return invoicesArray.length;
     }
 }
 
