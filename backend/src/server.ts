@@ -8,9 +8,15 @@ dotenv.config();
 
 const DEEL_INVOICE_URL: string =
   "https://api-staging.letsdeel.com/rest/v1/contracts/nw9z5ww/invoice-adjustments";
-const ERC20Address: string = "0xa513E6E4b8f2a923D98304ec87F64353C4D5C853";
-const INVOICE_MINTER_ADDRESS: string =
-  "0x2279B7A0a67DB372996a5FaB50D91eAA73d2eBe6";
+const ERC20_ADDRESS: string = fs.readFileSync(
+  "../deployments/localhost/erc20.txt",
+  "utf8"
+);
+const INVOICE_MINTER_ADDRESS: string = fs.readFileSync(
+  "../deployments/localhost/invoice-minter.txt",
+  "utf8"
+);
+("0xe7f1725e7734ce288f8367e1bb143e90bb3f0512");
 const deel_key: string = process.env.DEEL_KEY!;
 const web3storage_key: string = process.env.WEB3STORAGE_KEY!;
 
@@ -22,10 +28,6 @@ const wallet = new ethers.Wallet(
   "0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80",
   provider
 );
-const contractABI: any[] = [
-  /* ...your contract ABI here... */
-];
-const contractAddress = "YOUR_CONTRACT_ADDRESS";
 
 const erc20ABI = fs.readFileSync(
   "../deployments/localhost/erc20ABI.json",
@@ -35,7 +37,6 @@ const invoiceMinterABI = fs.readFileSync(
   "../deployments/localhost/invoiceMinterABI.json",
   "utf8"
 );
-const invoiceMinterAddress = INVOICE_MINTER_ADDRESS;
 // const signer = provider.getSigner();
 // const contract = new ethers.Contract(contractAddress, contractABI, signer);
 
@@ -57,6 +58,12 @@ const getData = (latest_invoice) => {
   );
   return id;
 };
+
+interface Invoice {
+  invoiceId: number;
+  details: string;
+  amount: string;
+}
 
 app.get("/", (req, res) => {
   res.send("Salary API is running");
@@ -96,7 +103,7 @@ app.post("/create-invoice", async (req, res) => {
     const { invoiceId, details, amount } = req.body;
 
     const invoiceMinterContract = new ethers.Contract(
-      invoiceMinterAddress,
+      INVOICE_MINTER_ADDRESS,
       invoiceMinterABI,
       wallet
     );
@@ -122,24 +129,26 @@ app.post("/create-invoice", async (req, res) => {
   }
 });
 
-app.get("/invoices/minted", async (req, res) => {
+app.get("/minted-invoices", async (req, res) => {
   try {
     const invoiceMinterContract = new ethers.Contract(
-      invoiceMinterAddress,
+      INVOICE_MINTER_ADDRESS,
       invoiceMinterABI,
       wallet
     );
-    const tx = await invoiceMinterContract.invoices("ID1");
-    console.log("tx", tx);
-    console.log("tx", tx.toString());
+    const invoicesCount = await invoiceMinterContract.getInvoicesCount();
 
-    await tx.wait();
+    let invoices: Invoice[] = [];
+    for (let i = 0; i < invoicesCount; i++) {
+      const invoice = await invoiceMinterContract.invoicesArray(i);
+      invoices.push({
+        invoiceId: invoice.invoiceId,
+        details: invoice.details,
+        amount: ethers.formatUnits(invoice.amount, 18), // Assuming 18 decimals, adjust if needed
+      });
+    }
 
-    res.json({
-      status: "success",
-      message: "Invoice created and tokens minted successfully!",
-      mintedTokens: tx.toString(),
-    });
+    res.json({ invoicesCount: invoicesCount.toString(), invoices: invoices });
   } catch (error: any) {
     console.log("Error", error);
     res.status(500).json({
@@ -151,11 +160,13 @@ app.get("/invoices/minted", async (req, res) => {
 
 app.get("/invoice-tokens/balance", async (req, res) => {
   try {
-    const erc20Contract = new ethers.Contract(ERC20Address, erc20ABI, wallet);
+    const erc20Contract = new ethers.Contract(ERC20_ADDRESS, erc20ABI, wallet);
+    console.log("erc20Contract", erc20Contract);
+    console.log("erc20Contract", await erc20Contract.getAddress());
     const erc20Balance = await erc20Contract.totalSupply();
 
     res.json({
-      totalBalance: erc20Balance.toString(),
+      totalBalance: ethers.formatUnits(erc20Balance, 18),
     });
   } catch (error: any) {
     console.log("Error", error);
