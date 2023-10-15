@@ -8,12 +8,9 @@ dotenv.config();
 
 const DEEL_INVOICE_URL: string =
   "https://api-staging.letsdeel.com/rest/v1/contracts/nw9z5ww/invoice-adjustments";
-const ERC20_ADDRESS: string = fs.readFileSync(
-  "../deployments/localhost/erc20.txt",
-  "utf8"
-);
+const ERC20_ADDRESS: string = fs.readFileSync("./contracts/erc20.txt", "utf8");
 const INVOICE_MINTER_ADDRESS: string = fs.readFileSync(
-  "../deployments/localhost/invoice-minter.txt",
+  "./contracts/invoice-minter.txt",
   "utf8"
 );
 ("0xe7f1725e7734ce288f8367e1bb143e90bb3f0512");
@@ -29,12 +26,9 @@ const wallet = new ethers.Wallet(
   provider
 );
 
-const erc20ABI = fs.readFileSync(
-  "../deployments/localhost/erc20ABI.json",
-  "utf8"
-);
+const erc20ABI = fs.readFileSync("./contracts/erc20ABI.json", "utf8");
 const invoiceMinterABI = fs.readFileSync(
-  "../deployments/localhost/invoiceMinterABI.json",
+  "./contracts/invoiceMinterABI.json",
   "utf8"
 );
 // const signer = provider.getSigner();
