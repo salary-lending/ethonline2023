@@ -2,6 +2,8 @@
 pragma solidity ^0.8.0;
 
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
+// Add the InvoiceTable import
+import "./InvoiceTable.sol";
 
 contract InvoiceToken is ERC20 {
     constructor() ERC20("InvoiceToken", "INV") {}
@@ -37,8 +39,11 @@ contract InvoiceFinancer {
 
     event InvoiceFinanced(string invoiceId, string details, uint256 amount);
 
-    constructor(address _invoiceTokenAddress) {
+    InvoiceTable private invoiceTable; // Instance of the InvoiceTable contract
+
+    constructor(address _invoiceTokenAddress, address _invoiceTableAddress) {
         invoiceToken = InvoiceToken(_invoiceTokenAddress);
+        invoiceTable = InvoiceTable(_invoiceTableAddress); // Initialize the InvoiceTable instance
     }
 
     function financeInvoice(
@@ -67,6 +72,14 @@ contract InvoiceFinancer {
         invoiceIdToIndex[invoiceId] = invoicesArray.length;
 
         invoiceToken.mint(msg.sender, mintAmount);
+        // Add to Tableland's InvoiceTable after the logic
+        invoiceTable.insert(
+            invoiceId,
+            details,
+            amount,
+            "Financed", // status
+            msg.sender // financedBy
+        );
         emit InvoiceFinanced(invoiceId, details, mintAmount);
     }
 
@@ -82,6 +95,8 @@ contract InvoiceFinancer {
 
         invoiceToken.transferFrom(msg.sender, address(this), amount);
         invoices[invoiceId].status = InvoiceStatus.Paid;
+        // Update Tableland's InvoiceTable after the logic
+        invoiceTable.updateStatus(invoiceId, "Paid");
     }
 
     function getInvoicesCount() public view returns (uint256) {

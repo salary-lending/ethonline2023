@@ -8,12 +8,26 @@ describe("InvoiceFinancer", function () {
   beforeEach(async function () {
     [owner, addr1, addr2] = await ethers.getSigners();
 
+    // Deploy the InvoiceTable contract
+    const InvoiceTable = await ethers.getContractFactory("InvoiceTable");
+    const invoiceTable = await InvoiceTable.deploy();
+
+    // Wait for the deployment to be mined
+    await invoiceTable.waitForDeployment();
+    await invoiceTable.create();
+    console.log("InvoiceTable", invoiceTable);
+
+    console.log("InvoiceTable deployed to:", invoiceTable.target);
+
     InvoiceToken = await ethers.getContractFactory("InvoiceToken");
     invoiceToken = await InvoiceToken.deploy();
     await invoiceToken.waitForDeployment();
 
     InvoiceFinancer = await ethers.getContractFactory("InvoiceFinancer");
-    invoiceFinancer = await InvoiceFinancer.deploy(invoiceToken.target);
+    invoiceFinancer = await InvoiceFinancer.deploy(
+      invoiceToken.target,
+      invoiceTable.target
+    );
     console.log("InvoiceFinancer deployed to:", invoiceFinancer.target);
     await invoiceFinancer.waitForDeployment();
   });
