@@ -5,8 +5,8 @@ import {ERC721AUpgradeable} from "erc721a-upgradeable/contracts/ERC721AUpgradeab
 import {ERC721AQueryableUpgradeable} from "erc721a-upgradeable/contracts/extensions/ERC721AQueryableUpgradeable.sol";
 import {UUPSUpgradeable} from "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
 import {OwnableUpgradeable} from "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
-import {PausableUpgradeable} from "@openzeppelin/contracts-upgradeable/utils/PausableUpgradeable.sol";
-import {ReentrancyGuardUpgradeable} from "@openzeppelin/contracts-upgradeable/utils/ReentrancyGuardUpgradeable.sol";
+import {PausableUpgradeable} from "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol";
+import {ReentrancyGuardUpgradeable} from "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol";
 import {ITablelandTables} from "./interfaces/ITablelandTables.sol";
 import {ITablelandController} from "./interfaces/ITablelandController.sol";
 import {TablelandPolicy} from "./TablelandPolicy.sol";
@@ -42,7 +42,7 @@ contract TablelandTables is
     ) public initializerERC721A initializer {
         __ERC721A_init("Tableland Tables", "TABLE");
         __ERC721AQueryable_init();
-        __Ownable_init(msg.sender);
+        __Ownable_init();
         __Pausable_init();
         __ReentrancyGuard_init();
         __UUPSUpgradeable_init();

@@ -7,31 +7,36 @@ async function main() {
 
   const ERC20TokenFactory = await ethers.getContractFactory("InvoiceToken");
   const erc20token = await ERC20TokenFactory.deploy();
-  await erc20token.waitForDeployment();
-  console.log(
-    `ERC20Token contract deployed at: ${await erc20token.getAddress()}`
-  );
+  await erc20token.deployed();
+  console.log(`ERC20Token contract deployed at: ${erc20token.address}`);
   // Save the contract address to a file
 
-  fs.writeFileSync(
-    "./backend/contracts/erc20.txt",
-    await erc20token.getAddress()
-  );
+  fs.writeFileSync("./deployments/localhost/erc20.txt", erc20token.address);
+
+  // Deploy the InvoiceTable contract
+  const InvoiceTable = await ethers.getContractFactory("InvoiceTable");
+  const invoiceTable = await InvoiceTable.deploy();
+
+  // Wait for the deployment to be mined
+  await invoiceTable.deployed();
+  console.log(`InvoiceTable contract deployed at: ${invoiceTable.address}`);
+
+  await invoiceTable.create({ gasLimit: 30000000 });
+  console.log(`InvoiceTable created at: ${invoiceTable.address}`);
 
   const InvoiceMinterFactory = await ethers.getContractFactory(
     "InvoiceFinancer"
   );
   const invoiceMinter = await InvoiceMinterFactory.deploy(
-    await erc20token.getAddress()
+    erc20token.address,
+    invoiceTable.address
   );
-  await invoiceMinter.waitForDeployment();
-  console.log(
-    `InvoiceMinter contract deployed at: ${await invoiceMinter.getAddress()}`
-  );
+  await invoiceMinter.deployed();
+  console.log(`InvoiceMinter contract deployed at: ${invoiceMinter.address}`);
   // Save the contract address to a file
   fs.writeFileSync(
-    "./backend/contracts/invoice-minter.txt",
-    await invoiceMinter.getAddress()
+    "./deployments/localhost/invoice-minter.txt",
+    invoiceMinter.address
   );
 }
 

@@ -5,19 +5,36 @@ import "@openzeppelin/contracts/utils/Strings.sol";
 import "@openzeppelin/contracts/token/ERC721/utils/ERC721Holder.sol";
 import "@tableland/evm/contracts/utils/TablelandDeployments.sol";
 import "@tableland/evm/contracts/utils/SQLHelpers.sol";
+import "hardhat/console.sol";
 
 contract InvoiceTable is ERC721Holder {
     uint256 private _tableId;
     string private constant _TABLE_PREFIX = "invoice_table";
 
-    function create() public payable {
-        string memory schema = SQLHelpers.toCreateFromSchema(
-            "id text primary key, details text, amount integer, status text, financedBy text,",
-            _TABLE_PREFIX
-        );
-
-        TablelandDeployments.get().create(address(this), schema);
+    // Add a constructor that creates and inserts data
+    constructor() {
+        // string memory schema = SQLHelpers.toCreateFromSchema(
+        //     "id text primary key, details text, amount integer, status text, financedBy text",
+        //     _TABLE_PREFIX
+        // );
+        // _tableId = TablelandDeployments.get().create(
+        //     address(this),
+        //     SQLHelpers.toCreateFromSchema(
+        //         "id integer primary key,", // Notice the trailing comma
+        //         _TABLE_PREFIX
+        //     )
+        // );
+        // console.log("_tableId: %s", _tableId);
     }
+
+    // function create() public payable {
+    //     string memory schema = SQLHelpers.toCreateFromSchema(
+    //         "id text primary key, details text, amount integer, status text, financedBy text,",
+    //         _TABLE_PREFIX
+    //     );
+
+    //     TablelandDeployments.get().create(address(this), schema);
+    // }
 
     function insert(
         string memory id,

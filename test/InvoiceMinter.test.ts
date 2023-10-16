@@ -10,32 +10,31 @@ describe("InvoiceFinancer", function () {
 
     // Deploy the InvoiceTable contract
     const InvoiceTable = await ethers.getContractFactory("InvoiceTable");
-    const invoiceTable = await InvoiceTable.deploy();
+    const invoiceTable = await InvoiceTable.deploy({ gasLimit: 3000000 });
 
     // Wait for the deployment to be mined
-    await invoiceTable.waitForDeployment();
-    await invoiceTable.create();
-    console.log("InvoiceTable", invoiceTable);
-
-    console.log("InvoiceTable deployed to:", invoiceTable.target);
+    await invoiceTable.deployed();
+    console.log(`InvoiceTable contract deployed at: ${invoiceTable.address}`);
+    // await invoiceTable.create();
 
     InvoiceToken = await ethers.getContractFactory("InvoiceToken");
     invoiceToken = await InvoiceToken.deploy();
-    await invoiceToken.waitForDeployment();
+    await invoiceToken.deployed();
+    console.log("InvoiceToken deployed to:", invoiceToken.address);
 
     InvoiceFinancer = await ethers.getContractFactory("InvoiceFinancer");
     invoiceFinancer = await InvoiceFinancer.deploy(
-      invoiceToken.target,
-      invoiceTable.target
+      invoiceToken.address,
+      invoiceTable.address
     );
-    console.log("InvoiceFinancer deployed to:", invoiceFinancer.target);
-    await invoiceFinancer.waitForDeployment();
+    console.log("InvoiceFinancer deployed to:", invoiceFinancer.address);
+    await invoiceFinancer.deployed();
   });
 
   describe("Financing an invoice", function () {
     it("Should mint 90% of invoice amount to the financier", async function () {
-      const invoiceAmount = ethers.parseEther("10"); // 10 ethers as an example
-      const expectedMintAmount = ethers.parseEther("10"); // change to 90 to have90% of 10
+      const invoiceAmount = ethers.utils.parseEther("10"); // 10 ethers as an example
+      const expectedMintAmount = ethers.utils.parseEther("10"); // change to 90 to have90% of 10
       const description = "Invoice Description 1";
 
       await invoiceFinancer
@@ -49,7 +48,7 @@ describe("InvoiceFinancer", function () {
 
   describe("Paying an invoice", function () {
     it("Should allow repayment of 100% invoice amount", async function () {
-      const invoiceAmount = ethers.parseEther("10");
+      const invoiceAmount = ethers.utils.parseEther("10");
       const description = "Invoice Description 1";
 
       // Address1 finances the invoice
@@ -57,11 +56,11 @@ describe("InvoiceFinancer", function () {
         .connect(addr1)
         .financeInvoice("INV001", description, invoiceAmount);
       // Address2 repays the invoice
-      const paymentAmount = ethers.parseEther("10");
+      const paymentAmount = ethers.utils.parseEther("10");
       await invoiceToken.connect(owner).mint(addr2.address, paymentAmount);
       await invoiceToken
         .connect(addr2)
-        .approve(invoiceFinancer.target, paymentAmount);
+        .approve(invoiceFinancer.address, paymentAmount);
       await invoiceFinancer.connect(addr2).payInvoice("INV001", paymentAmount);
 
       const balance = await invoiceToken.balanceOf(addr2.address);
