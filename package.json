@@ -30,6 +30,7 @@
     "erc721a-upgradeable": "^4.2.3",
     "hardhat-contract-sizer": "^2.8.0",
     "hardhat-gas-reporter": "^1.0.9",
+    "mock-stdin": "^1.0.0",
     "solidity-coverage": "^0.8.2"
   }
 }

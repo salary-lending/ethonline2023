@@ -87,6 +87,9 @@ const config: HardhatUserConfig = {
           ? [process.env.FILECOIN_CALIBRATION_PRIVATE_KEY]
           : [],
     },
+    "local-tableland": {
+      url: "http://127.0.0.1:8545",
+    },
   },
   baseURIs,
   proxies,

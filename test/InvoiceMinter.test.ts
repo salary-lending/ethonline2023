@@ -1,12 +1,40 @@
-import { ethers } from "hardhat";
+import { before, describe, test } from "mocha";
+import mockStdin from "mock-stdin";
 import { expect } from "chai";
+import { ethers } from "hardhat";
+import { LocalTableland, getAccounts } from "@tableland/local";
+import { Database } from "@tableland/sdk";
+import { deployments } from "../deployments";
+
+process.env.NODE_NO_WARNINGS = "stream/web";
+
+// setup a mocked stdin that lets us interact with the cli
+mockStdin.stdin();
+
+const lt = new LocalTableland({ silent: true });
+const accounts = getAccounts();
 
 describe("InvoiceFinancer", function () {
+  this.timeout(8000);
+
+  const accounts = getAccounts();
+  // Create a database connection; the signer passes the connected
+  // chain and is used for signing create table transactions
+  const db = new Database({ signer: accounts[0] });
+  // const tableland = connect({ chain: "local-tableland", signer: accounts[0] });
+
   let InvoiceToken, InvoiceFinancer, invoiceToken, invoiceFinancer;
   let owner, addr1, addr2;
 
   beforeEach(async function () {
     [owner, addr1, addr2] = await ethers.getSigners();
+
+    this.timeout(25000);
+    console.log("Starting LocalTableland");
+    await lt.start();
+    console.log("LocalTableland started");
+    await lt.isReady();
+    console.log("LocalTableland is ready");
 
     // Deploy the InvoiceTable contract
     const InvoiceTable = await ethers.getContractFactory("InvoiceTable");
@@ -15,6 +43,13 @@ describe("InvoiceFinancer", function () {
     // Wait for the deployment to be mined
     await invoiceTable.deployed();
     console.log(`InvoiceTable contract deployed at: ${invoiceTable.address}`);
+    const { meta: create } = await db
+      .prepare(`CREATE TABLE testTable (id integer primary key, val text);`)
+      .run();
+
+    // The table's `name` is in the format `{prefix}_{chainId}_{tableId}`
+    const txn = await create.txn; // e.g., my_sdk_table_80001_311
+    console.log(`InvoiceTable created at: ${txn}`);
     // await invoiceTable.create();
 
     InvoiceToken = await ethers.getContractFactory("InvoiceToken");

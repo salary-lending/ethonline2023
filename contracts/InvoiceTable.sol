@@ -11,30 +11,14 @@ contract InvoiceTable is ERC721Holder {
     uint256 private _tableId;
     string private constant _TABLE_PREFIX = "invoice_table";
 
-    // Add a constructor that creates and inserts data
-    constructor() {
-        // string memory schema = SQLHelpers.toCreateFromSchema(
-        //     "id text primary key, details text, amount integer, status text, financedBy text",
-        //     _TABLE_PREFIX
-        // );
-        // _tableId = TablelandDeployments.get().create(
-        //     address(this),
-        //     SQLHelpers.toCreateFromSchema(
-        //         "id integer primary key,", // Notice the trailing comma
-        //         _TABLE_PREFIX
-        //     )
-        // );
-        // console.log("_tableId: %s", _tableId);
+    function create() public payable {
+        string memory schema = SQLHelpers.toCreateFromSchema(
+            "id text primary key, details text, amount integer, status text, financedBy text,",
+            _TABLE_PREFIX
+        );
+
+        TablelandDeployments.get().create(address(this), schema);
     }
-
-    // function create() public payable {
-    //     string memory schema = SQLHelpers.toCreateFromSchema(
-    //         "id text primary key, details text, amount integer, status text, financedBy text,",
-    //         _TABLE_PREFIX
-    //     );
-
-    //     TablelandDeployments.get().create(address(this), schema);
-    // }
 
     function insert(
         string memory id,
