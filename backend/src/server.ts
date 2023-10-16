@@ -10,9 +10,9 @@ import cors from 'cors'
 
 dotenv.config();
 
-const ERC20_ADDRESS: string = "0x2279B7A0a67DB372996a5FaB50D91eAA73d2eBe6";
+const ERC20_ADDRESS: string = "0xDc64a140Aa3E981100a9becA4E685f962f0cF6C9";
 const INVOICE_MINTER_ADDRESS: string =
-  "0x8A791620dd6260079BF849Dc5567aDC3F2FdC318";
+  "0xa513E6E4b8f2a923D98304ec87F64353C4D5C853";
 const DEEL_INVOICE_URL: string =
   "https://api-staging.letsdeel.com/rest/v1/contracts/nw9z5ww/invoice-adjustments";
 const deel_key: string = process.env.DEEL_KEY!;
@@ -22,7 +22,7 @@ const app = express();
 
 const PORT = process.env.PORT || 3000;
 
-const provider = new ethers.JsonRpcProvider("http://127.0.0.1:8545");
+const provider = new ethers.JsonRpcProvider("http://127.0.0.1:8545/");
 const wallet = new ethers.Wallet(
   "0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80",
   provider

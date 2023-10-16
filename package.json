@@ -3,7 +3,8 @@
   "devDependencies": {
     "@tableland/local": "^2.0.2",
     "@tableland/sdk": "^4.5.3-dev.0",
-    "hardhat": "^2.13.0"
+    "hardhat": "^2.13.0",
+    "ts-node": "^10.9.1"
   },
   "dependencies": {
     "@ethersproject/providers": "^5.7.2",
@@ -30,6 +31,7 @@
     "erc721a-upgradeable": "^4.2.3",
     "hardhat-contract-sizer": "^2.8.0",
     "hardhat-gas-reporter": "^1.0.9",
+    "minimatch": "^9.0.3",
     "mock-stdin": "^1.0.0",
     "solidity-coverage": "^0.8.2"
   }
