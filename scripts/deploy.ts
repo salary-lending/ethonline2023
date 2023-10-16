@@ -21,7 +21,7 @@ async function main() {
   await invoiceTable.deployed();
   console.log(`InvoiceTable contract deployed at: ${invoiceTable.address}`);
 
-  await invoiceTable.create({ gasLimit: 30000000 });
+  await invoiceTable.create();
   console.log(`InvoiceTable created at: ${invoiceTable.address}`);
 
   const InvoiceMinterFactory = await ethers.getContractFactory(

@@ -73,13 +73,13 @@ contract InvoiceFinancer {
 
         invoiceToken.mint(msg.sender, mintAmount);
         // Add to Tableland's InvoiceTable after the logic
-        // invoiceTable.insert(
-        //     invoiceId,
-        //     details,
-        //     amount,
-        //     "Financed", // status
-        //     msg.sender // financedBy
-        // );
+        invoiceTable.insert(
+            invoiceId,
+            details,
+            amount,
+            "Financed", // status
+            msg.sender // financedBy
+        );
         emit InvoiceFinanced(invoiceId, details, mintAmount);
     }
 
@@ -96,7 +96,7 @@ contract InvoiceFinancer {
         invoiceToken.transferFrom(msg.sender, address(this), amount);
         invoices[invoiceId].status = InvoiceStatus.Paid;
         // Update Tableland's InvoiceTable after the logic
-        // invoiceTable.updateStatus(invoiceId, "Paid");
+        invoiceTable.updateStatus(invoiceId, "Paid");
     }
 
     function getInvoicesCount() public view returns (uint256) {

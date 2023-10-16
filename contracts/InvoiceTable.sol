@@ -8,16 +8,15 @@ import "@tableland/evm/contracts/utils/SQLHelpers.sol";
 import "hardhat/console.sol";
 
 contract InvoiceTable is ERC721Holder {
-    uint256 private _tableId;
+    uint256 public tableId;
     string private constant _TABLE_PREFIX = "invoice_table";
 
     function create() public payable {
         string memory schema = SQLHelpers.toCreateFromSchema(
-            "id text primary key, details text, amount integer, status text, financedBy text,",
+            "id text primary key, details text, amount text, status text, financedBy text",
             _TABLE_PREFIX
         );
-
-        TablelandDeployments.get().create(address(this), schema);
+        tableId = TablelandDeployments.get().create(address(this), schema);
     }
 
     function insert(
@@ -43,10 +42,10 @@ contract InvoiceTable is ERC721Holder {
 
         TablelandDeployments.get().mutate(
             address(this),
-            _tableId,
+            tableId,
             SQLHelpers.toInsert(
                 _TABLE_PREFIX,
-                _tableId,
+                tableId,
                 "id,details,amount,status,financedBy",
                 data
             )
@@ -61,7 +60,7 @@ contract InvoiceTable is ERC721Holder {
             abi.encodePacked(
                 "UPDATE ",
                 _TABLE_PREFIX,
-                Strings.toString(_tableId),
+                Strings.toString(tableId),
                 " SET status=",
                 SQLHelpers.quote(newStatus),
                 " WHERE id=",
@@ -69,7 +68,7 @@ contract InvoiceTable is ERC721Holder {
             )
         );
 
-        TablelandDeployments.get().mutate(address(this), _tableId, mutation);
+        TablelandDeployments.get().mutate(address(this), tableId, mutation);
     }
 
     // Helper function to convert address to string

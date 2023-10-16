@@ -3,54 +3,51 @@ import mockStdin from "mock-stdin";
 import { expect } from "chai";
 import { ethers } from "hardhat";
 import { LocalTableland, getAccounts } from "@tableland/local";
-import { Database } from "@tableland/sdk";
-import { deployments } from "../deployments";
+import { Database, Registry, Validator, helpers } from "@tableland/sdk";
 
 process.env.NODE_NO_WARNINGS = "stream/web";
 
 // setup a mocked stdin that lets us interact with the cli
 mockStdin.stdin();
 
-const lt = new LocalTableland({ silent: true });
+const lt = new LocalTableland({ silent: false });
 const accounts = getAccounts();
+// Create a database connection; the signer passes the connected
+// chain and is used for signing create table transactions
+const db = new Database({
+  signer: accounts[0],
+  baseUrl: helpers.getBaseUrl(31337),
+});
+let invoiceTable;
+
+before(async function () {
+  this.timeout(25000);
+  console.log("Starting LocalTableland");
+  await lt.start();
+  console.log("LocalTableland started");
+  await lt.isReady();
+  console.log("LocalTableland is ready");
+
+  // Deploy the InvoiceTable contract
+  const InvoiceTable = await ethers.getContractFactory("InvoiceTable");
+  invoiceTable = await InvoiceTable.deploy();
+
+  // Wait for the deployment to be mined
+  await invoiceTable.deployed();
+  console.log(`InvoiceTable contract deployed at: ${invoiceTable.address}`);
+
+  await invoiceTable.create();
+  console.log(`InvoiceTable created at: ${invoiceTable.address}`);
+});
 
 describe("InvoiceFinancer", function () {
   this.timeout(8000);
-
-  const accounts = getAccounts();
-  // Create a database connection; the signer passes the connected
-  // chain and is used for signing create table transactions
-  const db = new Database({ signer: accounts[0] });
-  // const tableland = connect({ chain: "local-tableland", signer: accounts[0] });
 
   let InvoiceToken, InvoiceFinancer, invoiceToken, invoiceFinancer;
   let owner, addr1, addr2;
 
   beforeEach(async function () {
     [owner, addr1, addr2] = await ethers.getSigners();
-
-    this.timeout(25000);
-    console.log("Starting LocalTableland");
-    await lt.start();
-    console.log("LocalTableland started");
-    await lt.isReady();
-    console.log("LocalTableland is ready");
-
-    // Deploy the InvoiceTable contract
-    const InvoiceTable = await ethers.getContractFactory("InvoiceTable");
-    const invoiceTable = await InvoiceTable.deploy({ gasLimit: 3000000 });
-
-    // Wait for the deployment to be mined
-    await invoiceTable.deployed();
-    console.log(`InvoiceTable contract deployed at: ${invoiceTable.address}`);
-    const { meta: create } = await db
-      .prepare(`CREATE TABLE testTable (id integer primary key, val text);`)
-      .run();
-
-    // The table's `name` is in the format `{prefix}_{chainId}_{tableId}`
-    const txn = await create.txn; // e.g., my_sdk_table_80001_311
-    console.log(`InvoiceTable created at: ${txn}`);
-    // await invoiceTable.create();
 
     InvoiceToken = await ethers.getContractFactory("InvoiceToken");
     invoiceToken = await InvoiceToken.deploy();
@@ -103,5 +100,43 @@ describe("InvoiceFinancer", function () {
     });
   });
 
+  describe("Tableland operations", function () {
+    it("Should insert a new invoice into the table", async function () {
+      const invoiceAmount = ethers.utils.parseEther("10"); // 10 ethers as an example
+      const invoiceId = "INV001";
+      const description = "Invoice Description 1";
+
+      await invoiceFinancer
+        .connect(addr1)
+        .financeInvoice(invoiceId, description, invoiceAmount);
+
+      const [signer] = await ethers.getSigners();
+      const chainId = await signer.getChainId();
+
+      // Use a `Validator` to get the table name
+      const validator = new Validator(db.config);
+      const tableName = await validator.getTableById({
+        chainId: chainId,
+        tableId: "2",
+      });
+
+      const data: JSON = await db
+        .prepare(`SELECT * from ${tableName.name}`)
+        .first();
+      console.log(`Data in table '${tableName.name}':`);
+      console.log(data);
+      expect(data["id"]).to.equal(invoiceId);
+      expect(data["details"]).to.equal(description);
+      expect(BigInt(Number(data["amount"])).toString()).to.equal(
+        invoiceAmount.toString()
+      );
+      expect(data["status"]).to.equal("Financed");
+    });
+  });
+
   // ... Add more tests as needed
+});
+
+after(async function () {
+  await lt.shutdown();
 });
