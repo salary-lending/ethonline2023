@@ -27,6 +27,7 @@ contract InvoiceFinancer {
     }
 
     struct Invoice {
+        string invoiceId;
         uint256 amount;
         InvoiceStatus status;
         string details;
@@ -60,6 +61,7 @@ contract InvoiceFinancer {
         uint256 mintAmount = amount;
 
         Invoice memory newInvoice = Invoice({
+            invoiceId: invoiceId,
             amount: mintAmount,
             status: InvoiceStatus.Financed,
             details: details,

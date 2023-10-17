@@ -1,16 +1,16 @@
-import { before, describe, test } from "mocha";
+import { before, describe } from "mocha";
 import mockStdin from "mock-stdin";
 import { expect } from "chai";
 import { ethers } from "hardhat";
 import { LocalTableland, getAccounts } from "@tableland/local";
-import { Database, Registry, Validator, helpers } from "@tableland/sdk";
+import { Database, Validator, helpers } from "@tableland/sdk";
 
 process.env.NODE_NO_WARNINGS = "stream/web";
 
 // setup a mocked stdin that lets us interact with the cli
 mockStdin.stdin();
 
-const lt = new LocalTableland({ silent: false });
+const lt = new LocalTableland({ silent: true, verbose: false });
 const accounts = getAccounts();
 // Create a database connection; the signer passes the connected
 // chain and is used for signing create table transactions
