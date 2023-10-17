@@ -20,3 +20,9 @@ npx hardhat run scripts/deploy.ts --network localhost
 cd backend
 npx ts-node src/server.ts
 ```
+
+### Run frontend
+```shell
+cd frontend
+npm run dev
+```
