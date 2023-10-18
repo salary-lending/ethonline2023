@@ -6,7 +6,7 @@ import { Web3Storage, getFilesFromPath } from "web3.storage";
 import fs from "fs";
 import { invoiceMinterABI } from "./ABIs/invoiceMinterABI";
 import { erc20ABI } from "./ABIs/erc20ABI";
-import cors from 'cors'
+import cors from "cors";
 
 dotenv.config();
 
@@ -28,14 +28,11 @@ const wallet = new ethers.Wallet(
   provider
 );
 
-
-
-
 // const signer = provider.getSigner();
 // const contract = new ethers.Contract(contractAddress, contractABI, signer);
 
 app.use(express.json());
-app.use(cors())
+app.use(cors());
 // Construct with token and endpoint
 const client = new Web3Storage({ token: web3storage_key });
 
@@ -131,10 +128,12 @@ app.get("/invoice/minted", async (req, res) => {
       wallet
     );
     const invoicesCount = await invoiceMinterContract.getInvoicesCount();
+    console.log("invoicesCount", invoicesCount.toString());
 
     let invoices: Invoice[] = [];
     for (let i = 0; i < invoicesCount; i++) {
       const invoice = await invoiceMinterContract.invoicesArray(i);
+      console.log("invoice", invoice);
       invoices.push({
         invoiceId: invoice.invoiceId,
         details: invoice.details,
@@ -155,8 +154,6 @@ app.get("/invoice/minted", async (req, res) => {
 app.get("/invoice-tokens/balance", async (req, res) => {
   try {
     const erc20Contract = new ethers.Contract(ERC20_ADDRESS, erc20ABI, wallet);
-    console.log("erc20Contract", erc20Contract);
-    console.log("erc20Contract", await erc20Contract.getAddress());
     const erc20Balance = await erc20Contract.totalSupply();
 
     res.json({
