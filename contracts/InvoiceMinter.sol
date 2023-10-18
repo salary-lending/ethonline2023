@@ -96,6 +96,7 @@ contract InvoiceFinancer {
         );
 
         invoiceToken.transferFrom(msg.sender, address(this), amount);
+        invoiceToken.burn(address(this), amount);
         invoices[invoiceId].status = InvoiceStatus.Paid;
         // Update Tableland's InvoiceTable after the logic
         invoiceTable.updateStatus(invoiceId, "Paid");

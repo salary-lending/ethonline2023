@@ -90,13 +90,16 @@ describe("InvoiceFinancer", function () {
       // Address2 repays the invoice
       const paymentAmount = ethers.utils.parseEther("10");
       await invoiceToken.connect(owner).mint(addr2.address, paymentAmount);
+      const beforeTokenBalance = await invoiceToken.totalSupply();
       await invoiceToken
         .connect(addr2)
         .approve(invoiceFinancer.address, paymentAmount);
       await invoiceFinancer.connect(addr2).payInvoice("INV001", paymentAmount);
 
       const balance = await invoiceToken.balanceOf(addr2.address);
+      const afterTokenBalance = await invoiceToken.totalSupply();
       expect(balance).to.equal(0);
+      expect(beforeTokenBalance.sub(paymentAmount)).to.equal(afterTokenBalance);
     });
   });
 
