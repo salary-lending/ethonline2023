@@ -1,21 +1,8 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
-// Add the InvoiceTable import
+import "./InvoiceToken.sol";
 import "./InvoiceTable.sol";
-
-contract InvoiceToken is ERC20 {
-    constructor() ERC20("InvoiceToken", "INV") {}
-
-    function mint(address to, uint256 amount) external {
-        _mint(to, amount);
-    }
-
-    function burn(address account, uint256 amount) external {
-        _burn(account, amount);
-    }
-}
 
 contract InvoiceFinancer {
     InvoiceToken public invoiceToken;
@@ -96,6 +83,7 @@ contract InvoiceFinancer {
         );
 
         invoiceToken.transferFrom(msg.sender, address(this), amount);
+        invoiceToken.burn(address(this), amount);
         invoices[invoiceId].status = InvoiceStatus.Paid;
         // Update Tableland's InvoiceTable after the logic
         invoiceTable.updateStatus(invoiceId, "Paid");

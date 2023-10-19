@@ -5,13 +5,16 @@ async function main() {
   const [deployer] = await ethers.getSigners();
   console.log(`Deploying contracts with the account: ${deployer.address}`);
 
-  const ERC20TokenFactory = await ethers.getContractFactory("InvoiceToken");
-  const erc20token = await ERC20TokenFactory.deploy();
-  await erc20token.deployed();
-  console.log(`ERC20Token contract deployed at: ${erc20token.address}`);
+  const InvoiceToken = await ethers.getContractFactory("InvoiceToken");
+  const invoiceToken = await InvoiceToken.deploy();
+  await invoiceToken.deployed();
+  console.log(`ERC20Token contract deployed at: ${invoiceToken.address}`);
   // Save the contract address to a file
 
-  fs.writeFileSync("./deployments/localhost/erc20.txt", erc20token.address);
+  const Dai = await ethers.getContractFactory("Dai");
+  const dai = await Dai.deploy();
+  await dai.deployed();
+  fs.writeFileSync("./deployments/localhost/erc20.txt", invoiceToken.address);
 
   // Deploy the InvoiceTable contract
   const InvoiceTable = await ethers.getContractFactory("InvoiceTable");
@@ -24,20 +27,54 @@ async function main() {
   await invoiceTable.create();
   console.log(`InvoiceTable created at: ${invoiceTable.address}`);
 
-  const InvoiceMinterFactory = await ethers.getContractFactory(
+  const InvoiceFinancerFactory = await ethers.getContractFactory(
     "InvoiceFinancer"
   );
-  const invoiceMinter = await InvoiceMinterFactory.deploy(
-    erc20token.address,
+  const invoiceFinancer = await InvoiceFinancerFactory.deploy(
+    invoiceToken.address,
     invoiceTable.address
   );
-  await invoiceMinter.deployed();
-  console.log(`InvoiceMinter contract deployed at: ${invoiceMinter.address}`);
+  await invoiceFinancer.deployed();
+  console.log(
+    `InvoiceFinancer contract deployed at: ${invoiceFinancer.address}`
+  );
   // Save the contract address to a file
   fs.writeFileSync(
     "./deployments/localhost/invoice-minter.txt",
-    invoiceMinter.address
+    invoiceFinancer.address
   );
+
+  const RolesAddress = await ethers.getContractFactory("AllocatorRoles");
+  const rolesAddress = await RolesAddress.deploy();
+  await rolesAddress.deployed();
+  console.log(`Roles contract deployed at: ${rolesAddress.address}`);
+
+  const RegistryAddress = await ethers.getContractFactory("AllocatorRegistry");
+  const registryAddress = await RegistryAddress.deploy();
+  await registryAddress.deployed();
+  console.log(`Registry contract deployed at: ${registryAddress.address}`);
+
+  const ArrangerConduit = await ethers.getContractFactory("ArrangerConduit");
+  const arrangerConduit = await ArrangerConduit.deploy();
+  await arrangerConduit.deployed();
+  console.log(
+    `ArrangerConduit contract deployed at: ${arrangerConduit.address}`
+  );
+
+  await arrangerConduit.setBroker(
+    invoiceFinancer.address,
+    invoiceToken.address,
+    true
+  );
+
+  const StrategyManager = await ethers.getContractFactory("StrategyManager");
+  await StrategyManager.deploy(
+    invoiceToken.address,
+    dai.address,
+    invoiceFinancer.address,
+    arrangerConduit.address
+  );
+  console.log();
 }
 
 // We recommend this pattern to be able to use async/await everywhere
