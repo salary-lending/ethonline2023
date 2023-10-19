@@ -24,19 +24,21 @@ async function main() {
   await invoiceTable.create();
   console.log(`InvoiceTable created at: ${invoiceTable.address}`);
 
-  const InvoiceMinterFactory = await ethers.getContractFactory(
+  const InvoiceFinancerFactory = await ethers.getContractFactory(
     "InvoiceFinancer"
   );
-  const invoiceMinter = await InvoiceMinterFactory.deploy(
+  const invoiceFinancer = await InvoiceFinancerFactory.deploy(
     invoiceToken.address,
     invoiceTable.address
   );
-  await invoiceMinter.deployed();
-  console.log(`InvoiceMinter contract deployed at: ${invoiceMinter.address}`);
+  await invoiceFinancer.deployed();
+  console.log(
+    `InvoiceFinancer contract deployed at: ${invoiceFinancer.address}`
+  );
   // Save the contract address to a file
   fs.writeFileSync(
     "./deployments/localhost/invoice-minter.txt",
-    invoiceMinter.address
+    invoiceFinancer.address
   );
 
   const RolesAddress = await ethers.getContractFactory("AllocatorRoles");
@@ -57,7 +59,7 @@ async function main() {
   );
 
   await arrangerConduit.setBroker(
-    invoiceMinter.address,
+    invoiceFinancer.address,
     invoiceToken.address,
     true
   );
