@@ -16,9 +16,6 @@ contract StrategyManager is ERC165, ReentrancyGuard {
     InvoiceFinancer public invoiceFinancer;
     ArrangerConduit public arrangerConduit;
 
-    // the address of the invoice security contract
-    address public immutable invoiceTokenAddress;
-
     // the address of the stable coinin which dividend is paid
     IERC20 public daiToken;
 
@@ -29,17 +26,16 @@ contract StrategyManager is ERC165, ReentrancyGuard {
     event Repay(address indexed who, address indexed asset, uint256 amount);
 
     /**
-     * @param _invoiceTokenAdrress address of the security contract
+     * @param _invoiceTokenAddress address of the security contract
      * @param _dividendCurrency address of the stable coin / cbdc in which dividend is paid
      */
     constructor(
-        address _invoiceTokenAdrress,
+        address _invoiceTokenAddress,
         address _dividendCurrency,
         address _invoiceFinancerAddress,
         address _arrangerConduitAddress
     ) {
-        invoiceTokenAddress = _invoiceTokenAdrress;
-        invoiceToken = InvoiceToken(_invoiceTokenAdrress);
+        invoiceToken = InvoiceToken(_invoiceTokenAddress);
         invoiceFinancer = InvoiceFinancer(_invoiceFinancerAddress);
         daiToken = IERC20(_dividendCurrency);
         arrangerConduit = ArrangerConduit(_arrangerConduitAddress);
