@@ -5,13 +5,13 @@ async function main() {
   const [deployer] = await ethers.getSigners();
   console.log(`Deploying contracts with the account: ${deployer.address}`);
 
-  const ERC20TokenFactory = await ethers.getContractFactory("InvoiceToken");
-  const erc20token = await ERC20TokenFactory.deploy();
-  await erc20token.deployed();
-  console.log(`ERC20Token contract deployed at: ${erc20token.address}`);
+  const InvoiceToken = await ethers.getContractFactory("InvoiceToken");
+  const invoiceToken = await InvoiceToken.deploy();
+  await invoiceToken.deployed();
+  console.log(`ERC20Token contract deployed at: ${invoiceToken.address}`);
   // Save the contract address to a file
 
-  fs.writeFileSync("./deployments/localhost/erc20.txt", erc20token.address);
+  fs.writeFileSync("./deployments/localhost/erc20.txt", invoiceToken.address);
 
   // Deploy the InvoiceTable contract
   const InvoiceTable = await ethers.getContractFactory("InvoiceTable");
@@ -28,7 +28,7 @@ async function main() {
     "InvoiceFinancer"
   );
   const invoiceMinter = await InvoiceMinterFactory.deploy(
-    erc20token.address,
+    invoiceToken.address,
     invoiceTable.address
   );
   await invoiceMinter.deployed();
@@ -37,6 +37,29 @@ async function main() {
   fs.writeFileSync(
     "./deployments/localhost/invoice-minter.txt",
     invoiceMinter.address
+  );
+
+  const RolesAddress = await ethers.getContractFactory("AllocatorRoles");
+  const rolesAddress = await RolesAddress.deploy();
+  await rolesAddress.deployed();
+  console.log(`Roles contract deployed at: ${rolesAddress.address}`);
+
+  const RegistryAddress = await ethers.getContractFactory("AllocatorRegistry");
+  const registryAddress = await RegistryAddress.deploy();
+  await registryAddress.deployed();
+  console.log(`Registry contract deployed at: ${registryAddress.address}`);
+
+  const ArrangerConduit = await ethers.getContractFactory("ArrangerConduit");
+  const arrangerConduit = await ArrangerConduit.deploy();
+  await arrangerConduit.deployed();
+  console.log(
+    `ArrangerConduit contract deployed at: ${arrangerConduit.address}`
+  );
+
+  await arrangerConduit.setBroker(
+    invoiceMinter.address,
+    invoiceToken.address,
+    true
   );
 }
 

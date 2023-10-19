@@ -4,11 +4,10 @@ import { expect } from "chai";
 import { ethers } from "hardhat";
 import { LocalTableland, getAccounts } from "@tableland/local";
 import { Database, Validator, helpers } from "@tableland/sdk";
-
-process.env.NODE_NO_WARNINGS = "stream/web";
+import { buffer } from "stream/consumers";
 
 // setup a mocked stdin that lets us interact with the cli
-mockStdin.stdin();
+// mockStdin.stdin();
 
 const lt = new LocalTableland({ silent: true, verbose: false });
 const accounts = getAccounts();
@@ -18,7 +17,7 @@ const db = new Database({
   signer: accounts[0],
   baseUrl: helpers.getBaseUrl(31337),
 });
-let invoiceTable;
+let invoiceTable, buffer1, roles, registry, dai;
 
 before(async function () {
   this.timeout(25000);
@@ -27,6 +26,10 @@ before(async function () {
   console.log("LocalTableland started");
   await lt.isReady();
   console.log("LocalTableland is ready");
+
+  const Dai = await ethers.getContractFactory("Dai");
+  dai = await Dai.deploy();
+  console.log(`Dai contract deployed at: ${dai.address}`);
 
   // Deploy the InvoiceTable contract
   const InvoiceTable = await ethers.getContractFactory("InvoiceTable");
@@ -38,6 +41,25 @@ before(async function () {
 
   await invoiceTable.create();
   console.log(`InvoiceTable created at: ${invoiceTable.address}`);
+
+  const AllocatorRoles = await ethers.getContractFactory("AllocatorRoles");
+  roles = await AllocatorRoles.deploy();
+  await roles.deployed();
+  console.log(`Roles contract deployed at: ${roles.address}`);
+
+  const AllocatorRegistry = await ethers.getContractFactory(
+    "AllocatorRegistry"
+  );
+  registry = await AllocatorRegistry.deploy();
+  await registry.deployed();
+  console.log(`Registry contract deployed at: ${registry.address}`);
+  const ilk1 = "ilk1";
+  buffer1 = accounts[1];
+  registry.file(
+    ethers.utils.formatBytes32String(ilk1),
+    "buffer",
+    buffer1.address
+  );
 });
 
 describe("InvoiceFinancer", function () {
@@ -100,6 +122,68 @@ describe("InvoiceFinancer", function () {
       const afterTokenBalance = await invoiceToken.totalSupply();
       expect(balance).to.equal(0);
       expect(beforeTokenBalance.sub(paymentAmount)).to.equal(afterTokenBalance);
+    });
+  });
+
+  describe("SparkConduit", function () {
+    it("Should deposit Invoice Tokens and borrow Dai", async function () {
+      const invoiceAmount = ethers.utils.parseEther("10"); // 10 ethers as an example
+      const expectedMintAmount = ethers.utils.parseEther("10"); // change to 90 to have90% of 10
+      const description = "Invoice Description 1";
+
+      await invoiceFinancer
+        .connect(addr1)
+        .financeInvoice("INV001", description, invoiceAmount);
+      const balance = await invoiceToken.balanceOf(addr1.address);
+
+      const ArrangerConduit = await ethers.getContractFactory(
+        "ArrangerConduit"
+      );
+      const arrangerConduit = await ArrangerConduit.deploy();
+      await arrangerConduit.deployed();
+      console.log(
+        `ArrangerConduit contract deployed at: ${arrangerConduit.address}`
+      );
+
+      arrangerConduit.file("arranger", owner.address);
+      arrangerConduit.file("registry", registry.address);
+      arrangerConduit.file("roles", roles.address);
+
+      registry.file("ilk1", "buffer", buffer1.address);
+
+      await arrangerConduit.setBroker(
+        invoiceFinancer.address,
+        invoiceToken.address,
+        true
+      );
+
+      const beforeTokenBalance = await invoiceToken.balanceOf(buffer1.address);
+      await invoiceToken.mint(buffer1.address, 100);
+      const mintedTokenBalance = await invoiceToken.balanceOf(buffer1.address);
+      expect(mintedTokenBalance).to.equal(beforeTokenBalance.add(100));
+
+      await invoiceToken.connect(buffer1).approve(arrangerConduit.address, 100);
+      await arrangerConduit.deposit(
+        buffer1.address,
+        invoiceToken.address,
+        100,
+        { gasLimit: 4000000 }
+      );
+      console.log("deposit done");
+
+      const beforeOwnerBalance = await dai.balanceOf(owner.address);
+      await dai.mint(arrangerConduit.address, 100);
+      const daiBalance = await dai.balanceOf(arrangerConduit.address);
+      await arrangerConduit.drawFunds(dai.address, owner.address, 100, {
+        gasLimit: 4000000,
+      });
+
+      const afterOwnerBalance = await dai.balanceOf(owner.address);
+      const afterDaiBalance = await dai.balanceOf(arrangerConduit.address);
+
+      expect(afterOwnerBalance).to.equal(beforeOwnerBalance.add(100));
+      expect(afterDaiBalance).to.equal(daiBalance.sub(100));
+      expect(balance).to.equal(expectedMintAmount);
     });
   });
 
