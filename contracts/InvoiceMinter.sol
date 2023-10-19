@@ -102,4 +102,8 @@ contract InvoiceFinancer {
     function getInvoicesCount() public view returns (uint256) {
         return invoicesArray.length;
     }
+
+    function getInvoiceAmount(string calldata invoiceId) external view returns (uint256) {
+        return invoices[invoiceId].amount;
+    }
 }
