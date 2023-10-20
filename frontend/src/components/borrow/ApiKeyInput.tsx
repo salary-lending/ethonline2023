@@ -1,21 +1,35 @@
 import { Button, Input } from "@nextui-org/react";
-import React from "react";
+import React, { useState } from "react";
 import { AiOutlineApi } from "react-icons/ai";
 import useDeelStore from "../stores/useDeelStore";
 import { toast } from "sonner";
 import useBorrowFormState from "../stores/useBorrowStore";
+import axios from "axios";
+import { API_URL } from "../constants/api";
 
 type Props = {};
 
 const ApiKeyInput = (props: Props) => {
-  const { setApiKey, apiKey } = useDeelStore();
+  const { setApiKey, apiKey, setInvoices } = useDeelStore();
   const { setCurrentStep } = useBorrowFormState();
-
-  const handleSubmit = () => {
+  const [isFetching, setIsFetching] = useState(false);
+  const handleSubmit = async () => {
     if (!apiKey) {
       toast.error("Invalid api key");
+      return
     } else {
-      setCurrentStep(1);
+      try {
+        setIsFetching(true);
+        const invoicesRes = await axios.get(`${API_URL}/deel/invoice`);
+        console.log(invoicesRes);
+        setInvoices(invoicesRes.data.data);
+        setCurrentStep(1);
+      } catch (err: any) {
+        console.log(err);
+        toast.error(err?.message ?? "Something went wrong");
+      } finally {
+        setIsFetching(false);
+      }
     }
   };
 
@@ -36,8 +50,9 @@ const ApiKeyInput = (props: Props) => {
         color="primary"
         size="lg"
         onClick={handleSubmit}
+        isLoading={isFetching}
       >
-        Connect Deel
+        {isFetching ? "Getting data..." : "Connect Deel"}
       </Button>
     </div>
   );

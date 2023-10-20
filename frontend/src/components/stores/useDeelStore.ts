@@ -15,7 +15,7 @@ type InvoiceState = {
 const useDeelStore = create<InvoiceState>((set) => ({
   apiKey: "",
   currentStep: 0,
-  invoices: DEEL_TEST_INVOICES,
+  invoices: [],
   isFetching: false,
   setInvoices: (_invoices: InvoiceType[]) => {
     set((state) => ({

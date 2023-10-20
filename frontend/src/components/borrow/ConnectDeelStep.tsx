@@ -10,11 +10,6 @@ type Props = {};
 const ConnectDeelStep = (props: Props) => {
   const { apiKey } = useDeelStore();
   const { setCurrentStep } = useBorrowFormState();
-  useEffect(() => {
-    if (apiKey !== "") {
-      setCurrentStep(1);
-    }
-  }, []);
 
   return (
     <Card>

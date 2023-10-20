@@ -1,10 +1,7 @@
 import {
   Button,
   Navbar,
-  NavbarBrand,
   NavbarContent,
-  Tab,
-  Tabs,
 } from "@nextui-org/react";
 import Link from "next/link";
 
@@ -29,7 +26,7 @@ const Header = (props: Props) => {
   ];
 
   const navigateTo = (nextPath: string) => {
-    console.log("navigating");
+    console.log("navigating",{currentPath,nextPath});
     if (currentPath !== nextPath) {
       router.push(nextPath);
     }
@@ -44,21 +41,11 @@ const Header = (props: Props) => {
           {/* <div className="h-8 w-[2px] bg-gradient-to-b from-transparent via-zinc-400 to-transparent rounded-full"></div> */}
         </NavbarContent>
         <NavbarContent justify="center">
-          <Tabs
-            onSelectionChange={(key) => navigateTo(key.toString())}
-            color="primary"
-            aria-label="Navlinks"
-            radius="lg"
-          >
+         
             {navLinks.map((item) => (
-              <Tab
-                key={item.path}
-                title={item.name}
-                onSelect={() => navigateTo(item.path)}
-              />
+              <Link href={item.path} key={item.path}>{item.name}</Link>
             ))}
-          </Tabs>
-        </NavbarContent>
+            </NavbarContent>
         <NavbarContent justify="end">
           <Button
             onClick={() => toast("Hii")}
