@@ -17,7 +17,7 @@ const db = new Database({
   signer: accounts[0],
   baseUrl: helpers.getBaseUrl(31337),
 });
-let invoiceTable, buffer1, roles, registry, dai;
+let invoiceTable, buffer1, roles, registry, dai, usdc;
 
 before(async function () {
   this.timeout(25000);
@@ -30,6 +30,10 @@ before(async function () {
   const Dai = await ethers.getContractFactory("Dai");
   dai = await Dai.deploy();
   console.log(`Dai contract deployed at: ${dai.address}`);
+
+  const Usdc = await ethers.getContractFactory("Usdc");
+  usdc = await Usdc.deploy();
+  console.log(`Usdc contract deployed at: ${usdc.address}`);
 
   // Deploy the InvoiceTable contract
   const InvoiceTable = await ethers.getContractFactory("InvoiceTable");
@@ -218,6 +222,63 @@ describe("InvoiceFinancer", function () {
         invoiceAmount.toString()
       );
       expect(data["status"]).to.equal("Financed");
+    });
+  });
+
+  describe("StrategyManager", function () {
+    it("Should borrow", async function () {
+      const ArrangerConduit = await ethers.getContractFactory(
+        "ArrangerConduit"
+      );
+      const arrangerConduit = await ArrangerConduit.deploy();
+      await arrangerConduit.deployed();
+      console.log(
+        `ArrangerConduit contract deployed at: ${arrangerConduit.address}`
+      );
+      const StrategyManager = await ethers.getContractFactory(
+        "StrategyManager"
+      );
+      const strategyManager = await StrategyManager.deploy(
+        invoiceToken.address,
+        dai.address,
+        invoiceFinancer.address,
+        arrangerConduit.address,
+        usdc.address
+      );
+      console.log("StrategyManager deployed to:", strategyManager.address);
+      console.log("Addr1", addr1.address);
+
+      await invoiceToken.mint(addr1.address, 100);
+      await dai.mint(strategyManager.address, 100);
+      await invoiceToken.connect(addr1).approve(arrangerConduit.address, 100);
+      await strategyManager
+        .connect(addr1)
+        .borrow(dai.address, 100, { gasLimit: 400000 });
+      const balance = await dai.balanceOf(addr1.address);
+      expect(balance).to.equal(100);
+    });
+
+    it("Should repay", async function () {
+      const invoiceAmount = ethers.utils.parseEther("10");
+      const description = "Invoice Description 1";
+
+      // Address1 finances the invoice
+      await invoiceFinancer
+        .connect(addr1)
+        .financeInvoice("INV001", description, invoiceAmount);
+      // Address2 repays the invoice
+      const paymentAmount = ethers.utils.parseEther("10");
+      await invoiceToken.connect(owner).mint(addr2.address, paymentAmount);
+      const beforeTokenBalance = await invoiceToken.totalSupply();
+      await invoiceToken
+        .connect(addr2)
+        .approve(invoiceFinancer.address, paymentAmount);
+      await invoiceFinancer.connect(addr2).payInvoice("INV001", paymentAmount);
+
+      const balance = await invoiceToken.balanceOf(addr2.address);
+      const afterTokenBalance = await invoiceToken.totalSupply();
+      expect(balance).to.equal(0);
+      expect(beforeTokenBalance.sub(paymentAmount)).to.equal(afterTokenBalance);
     });
   });
 
