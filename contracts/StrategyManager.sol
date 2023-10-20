@@ -66,7 +66,7 @@ contract StrategyManager is ERC165, ReentrancyGuard {
     function borrow(address asset, uint256 amount) external nonReentrant {
         stakedSecurityTokens[msg.sender] += amount;
         arrangerConduit.deposit(msg.sender, address(invoiceToken), amount);
-        arrangerConduit.drawFunds(address(dai), msg.sender, amount);
+        // arrangerConduit.drawFunds(address(dai), msg.sender, amount);
         bool success = dai.transfer(msg.sender, amount);
         emit Borrow(msg.sender, asset, amount);
     }
