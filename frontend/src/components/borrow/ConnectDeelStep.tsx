@@ -1,11 +1,21 @@
 import { Card, CardBody } from "@nextui-org/react";
-import React from "react";
+import React, { useDebugValue, useEffect, useState } from "react";
 import Heading from "../ui/Heading";
 import ApiKeyInput from "./ApiKeyInput";
+import useBorrowFormState from "../stores/useBorrowStore";
+import useDeelStore from "../stores/useDeelStore";
 
 type Props = {};
 
 const ConnectDeelStep = (props: Props) => {
+  const { apiKey } = useDeelStore();
+  const { setCurrentStep } = useBorrowFormState();
+  useEffect(() => {
+    if (apiKey !== "") {
+      setCurrentStep(1);
+    }
+  }, []);
+
   return (
     <Card>
       <CardBody>

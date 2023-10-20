@@ -1,25 +1,21 @@
 
 import {create} from 'zustand';
+import { InvoiceType } from '../types/invoice.type';
 
 type BorrowFormState = {
   currentStep: number;
-  formData: {
-    
-  };
+  selectedInvoiceToMint:InvoiceType
   setCurrentStep: (step: number) => void;
-  setFormData: (data: Partial<BorrowFormState['formData']>) => void;
+  setSelectedInvoiceToMint:(invoice:InvoiceType) => void;
   nextStep: () => void;
   prevStep: () => void;
 };
 
 const useBorrowFormState = create<BorrowFormState>((set) => ({
   currentStep: 0,
-  formData: {
-    apiKey:"",
-    selectedInvoiceToMint:""
-  },
+  selectedInvoiceToMint:{} as InvoiceType,
   setCurrentStep: (step) => set({ currentStep: step }),
-  setFormData: (data) => set((state) => ({ formData: { ...state.formData, ...data } })),
+  setSelectedInvoiceToMint: (invoice) => set((state)=> ({selectedInvoiceToMint:invoice})),
   nextStep: () => set((state) => ({ currentStep: state.currentStep + 1 })),
   prevStep: () => set((state) => ({ currentStep: state.currentStep - 1 })),
 }));

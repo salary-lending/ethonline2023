@@ -1,12 +1,13 @@
 import { Card, CardBody } from "@nextui-org/react";
 import React from "react";
 import Heading from "../ui/Heading";
-import { DEEL_TEST_INVOICES } from "../constants/invoice_data";
 import InvoiceItem from "./InvoiceItem";
+import useDeelStore from "../stores/useDeelStore";
 
 type Props = {};
 
 const ShowInvoicesStep = (props: Props) => {
+  const {invoices,setInvoices} = useDeelStore()
   return (
     <Card>
       <CardBody>
@@ -15,7 +16,8 @@ const ShowInvoicesStep = (props: Props) => {
           Select an invoice to mint as token and borrow capital.
         </p>
         <div className="flex flex-col gap-4 mt-4">
-          {DEEL_TEST_INVOICES.map((it) => (
+          {invoices.length === 0 &&  <p className="text-center font-heading text-red-600 font-medium">No invoices found !!</p>}
+          {invoices.map((it) => (
             <InvoiceItem key={it.id} {...it} />
           ))}
         </div>
