@@ -10,11 +10,17 @@ async function main() {
   await invoiceToken.deployed();
   console.log(`ERC20Token contract deployed at: ${invoiceToken.address}`);
   // Save the contract address to a file
+  fs.writeFileSync("./deployments/localhost/erc20.txt", invoiceToken.address);
 
   const Dai = await ethers.getContractFactory("Dai");
   const dai = await Dai.deploy();
   await dai.deployed();
-  fs.writeFileSync("./deployments/localhost/erc20.txt", invoiceToken.address);
+  console.log(`Dai contract deployed at: ${dai.address}`);
+
+  const Usdc = await ethers.getContractFactory("Usdc");
+  const usdc = await Usdc.deploy();
+  await usdc.deployed();
+  console.log(`Usdc contract deployed at: ${usdc.address}`);
 
   // Deploy the InvoiceTable contract
   const InvoiceTable = await ethers.getContractFactory("InvoiceTable");
@@ -72,7 +78,8 @@ async function main() {
     invoiceToken.address,
     dai.address,
     invoiceFinancer.address,
-    arrangerConduit.address
+    arrangerConduit.address,
+    usdc.address
   );
   console.log();
 }
