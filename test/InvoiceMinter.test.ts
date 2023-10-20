@@ -248,6 +248,8 @@ describe("InvoiceFinancer", function () {
       console.log("StrategyManager deployed to:", strategyManager.address);
       console.log("Addr1", addr1.address);
 
+      const beforeBalance = await dai.balanceOf(addr1.address);
+      expect(beforeBalance).to.equal(0);
       await invoiceToken.mint(addr1.address, 100);
       await dai.mint(strategyManager.address, 100);
       await invoiceToken.connect(addr1).approve(arrangerConduit.address, 100);
