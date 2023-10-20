@@ -1,45 +1,58 @@
-import { Button, Navbar, NavbarBrand, NavbarContent } from "@nextui-org/react";
+import {
+  Button,
+  Navbar,
+  NavbarContent,
+} from "@nextui-org/react";
 import Link from "next/link";
 
 import React from "react";
 import { toast } from "sonner";
-import {usePathname, useRouter} from 'next/navigation'
+import { usePathname, useRouter } from "next/navigation";
 
 type Props = {};
 
 const Header = (props: Props) => {
-  const router = useRouter()
-  const currentPath = usePathname()
+  const router = useRouter();
+  const currentPath = usePathname();
   const navLinks = [
     {
-      name:"Borrow",
-      path:"/borrow"
+      name: "Borrow",
+      path: "/borrow",
     },
     {
-      name:"Dashboard",
-      path:"/dashboard"
+      name: "Minted Tokens",
+      path: "/minted",
+    },
+  ];
+
+  const navigateTo = (nextPath: string) => {
+    console.log("navigating",{currentPath,nextPath});
+    if (currentPath !== nextPath) {
+      router.push(nextPath);
     }
-  ]
+  };
   return (
     <>
-      <Navbar className=" bg-zinc-400/25 border-b  border-zinc-400/25">
+      <Navbar className=" border-b bg-default-50/75  border-zinc-200/25">
         <NavbarContent justify="start">
-          <h1 className="font-bold tracking-wider sm:text-2xl">SparkFi</h1>
+          <h1 className="font-bold  tracking-wider sm:text-2xl font-heading">
+            SparkFi
+          </h1>
           {/* <div className="h-8 w-[2px] bg-gradient-to-b from-transparent via-zinc-400 to-transparent rounded-full"></div> */}
-          <div className="flex gap-4 items-center">
-            {
-              navLinks.map((item)=>(
-                <Link  onClick={()=>{
-                  if(currentPath===item.path){
-                    router.refresh()
-                  }
-                }} className={`text-zinc-700  hover:text-primary-600  hover: font-semibold origin-center duration-200`} href={item.path} key={item.path}>{item.name}</Link>
-              ))
-            }
-          </div>
         </NavbarContent>
+        <NavbarContent justify="center">
+         
+            {navLinks.map((item) => (
+              <Link href={item.path} key={item.path}>{item.name}</Link>
+            ))}
+            </NavbarContent>
         <NavbarContent justify="end">
-          <Button onClick={() => toast("Hii")} color="primary">
+          <Button
+            onClick={() => toast("Hii")}
+            color="default"
+            variant="faded"
+            radius="lg"
+          >
             Connect Wallet{" "}
           </Button>
         </NavbarContent>
