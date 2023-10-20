@@ -8,6 +8,7 @@ import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "./InvoiceToken.sol";
 import "./InvoiceFinancer.sol";
 import "./ArrangerConduit.sol";
+// import "./V4SwapCaller.sol";
 
 contract StrategyManager is ERC165, ReentrancyGuard {
     using SafeMath for uint256;
@@ -39,6 +40,9 @@ contract StrategyManager is ERC165, ReentrancyGuard {
         invoiceFinancer = InvoiceFinancer(_invoiceFinancerAddress);
         daiToken = IERC20(_dividendCurrency);
         arrangerConduit = ArrangerConduit(_arrangerConduitAddress);
+
+        // TODO: init UniswapPool
+        // V4SwapCaller().init();
     }
 
     // /**
@@ -75,5 +79,12 @@ contract StrategyManager is ERC165, ReentrancyGuard {
         bool success = daiToken.transferFrom(msg.sender, address(this), amount);
         invoiceToken.transfer(msg.sender, amount);
         emit Repay(msg.sender, asset, amount);
+    }
+
+    // TODO
+    function swap(address asset, uint256 amount) external nonReentrant {
+        // should call uniswap v4 router to swap tokens DAI -> USDC and return USDC to the user
+        // V4SwapCaller.swap();
+        // and check if user has PolygonID minted
     }
 }
