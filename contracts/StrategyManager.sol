@@ -7,6 +7,7 @@ import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
 import "./InvoiceToken.sol";
 import "./Usdc.sol";
+import "./Dai.sol";
 import "./InvoiceFinancer.sol";
 import "./ArrangerConduit.sol";
 
@@ -17,9 +18,7 @@ contract StrategyManager is ERC165, ReentrancyGuard {
     InvoiceFinancer public invoiceFinancer;
     ArrangerConduit public arrangerConduit;
     Usdc public usdc;
-
-    // the address of the stable coinin which dividend is paid
-    IERC20 public daiToken;
+    Dai public dai;
 
     mapping(address => uint256) public stakedSecurityTokens;
 
@@ -36,13 +35,13 @@ contract StrategyManager is ERC165, ReentrancyGuard {
         address _dividendCurrency,
         address _invoiceFinancerAddress,
         address _arrangerConduitAddress,
-        address _usdcAddress,
+        address _usdcAddress
     ) {
         invoiceToken = InvoiceToken(_invoiceTokenAddress);
         invoiceFinancer = InvoiceFinancer(_invoiceFinancerAddress);
-        daiToken = IERC20(_dividendCurrency);
+        dai = Dai(_dividendCurrency);
         arrangerConduit = ArrangerConduit(_arrangerConduitAddress);
-        Usdc = IERC20(_usdcAddress);
+        usdc = Usdc(_usdcAddress);
     }
 
     // /**
@@ -67,8 +66,8 @@ contract StrategyManager is ERC165, ReentrancyGuard {
     function borrow(address asset, uint256 amount) external nonReentrant {
         stakedSecurityTokens[msg.sender] += amount;
         arrangerConduit.deposit(msg.sender, address(invoiceToken), amount);
-        arrangerConduit.drawFunds(address(daiToken), msg.sender, amount);
-        bool success = daiToken.transfer(msg.sender, amount);
+        arrangerConduit.drawFunds(address(dai), msg.sender, amount);
+        bool success = dai.transfer(msg.sender, amount);
         emit Borrow(msg.sender, asset, amount);
     }
 
@@ -76,21 +75,21 @@ contract StrategyManager is ERC165, ReentrancyGuard {
         stakedSecurityTokens[msg.sender] -= amount;
         // arrangerConduit.returnFunds(fundRequestId, amount);
         // invoiceFinancer.payInvoice("1", amount);
-        bool success = daiToken.transferFrom(msg.sender, address(this), amount);
+        bool success = dai.transferFrom(msg.sender, address(this), amount);
         invoiceToken.transfer(msg.sender, amount);
         emit Repay(msg.sender, asset, amount);
     }
 
-    function swapUsdc(address asset, uint256 amount) external nonReentrant {
+    function swapUsdc(uint256 amount) external nonReentrant {
         // TODO: implement
         // should call uniswap v4 router to swap tokens DAI -> USDC and return USDC to the user
         // and check if user has PolygonID minted
-        daiToken.transferFrom(msg.sender, address(this), amount);
+        dai.transferFrom(msg.sender, address(this), amount);
         usdc.mint(msg.sender, amount);
     }
 
-    function swapDai(address asset, uint256 amount) external nonReentrant {
+    function swapDai(uint256 amount) external nonReentrant {
         usdc.transferFrom(msg.sender, address(this), amount);
-        daiToken.mint(msg.sender, amount);
+        dai.mint(msg.sender, amount);
     }
 }
