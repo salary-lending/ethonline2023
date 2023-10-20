@@ -20,7 +20,7 @@ const web3storage_key: string = process.env.WEB3STORAGE_KEY!;
 
 const app = express();
 
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 3001;
 
 const provider = new ethers.JsonRpcProvider("http://127.0.0.1:8545");
 const wallet = new ethers.Wallet(
@@ -187,7 +187,7 @@ app.get("/invoice-tokens/balance", async (req, res) => {
 //   }
 // });
 
-app.listen(process.env.PORT || 3000, () => {
+app.listen(PORT, () => {
   console.log(`Server is running on http://localhost:${PORT}`);
 });
 
