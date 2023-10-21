@@ -13,22 +13,28 @@ import { BsArrowRight } from "react-icons/bs";
 type Props = {
   invoice: InvoiceType;
   handleMintClick: (invoiceId: string, amount: string) => void;
+  isMinted: boolean;
 };
 
-const InvoiceItem = ({ invoice, handleMintClick }: Props) => {
+const InvoiceItem = ({ invoice, handleMintClick, isMinted }: Props) => {
   return (
-    <Card className="bg-default-100/50 group  hover:ring-primary hover:ring-1">
+    <Card className={`bg-default-100/50 group  hover:ring-primary hover:ring-1 ${isMinted && "brightness-75 hover:ring-default-300"}`}>
       <CardBody>
         <div className="flex items-center justify-between">
           <h6 className="font-semibold font-heading text-xl">
             {invoice.contract.title}
           </h6>
-          {invoice.status === "paid" && (
+          {isMinted && (
+            <Chip  color="primary">
+              Already Minted
+            </Chip>
+          )}
+          {!isMinted && invoice.status === "paid" && (
             <Chip variant="flat" color="success">
               Paid
             </Chip>
           )}
-          {invoice.status === "approved" && (
+          {!isMinted && invoice.status === "approved" && (
             <Chip variant="flat" color="warning">
               Approved
             </Chip>
@@ -58,15 +64,17 @@ const InvoiceItem = ({ invoice, handleMintClick }: Props) => {
             invoice.currency_code
           }`}
         </p>
-        <Button
-          color="primary"
-          variant="solid"
-          onClick={() =>
-            handleMintClick(invoice.id.toString(), invoice.total_amount)
-          }
-        >
-          Mint Token
-        </Button>
+        {!isMinted && (
+          <Button
+            color="primary"
+            variant="solid"
+            onClick={() =>
+              handleMintClick(invoice.id.toString(), invoice.total_amount)
+            }
+          >
+            Mint Token
+          </Button>
+        )}
       </CardFooter>
     </Card>
   );

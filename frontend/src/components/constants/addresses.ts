@@ -1,18 +1,22 @@
-export const INVOICE_FINANCER_ADDRESS = "0x5b266b4BD7D3515d0A754102086039b7DA8DF938"
-export const STRATEGY_MANAGER_ADDRESS = "0x42dd46872A14153b3CBd46ba43981e707c8B2f45"
-export const DAI_ADDRESS = "0x554cdbaba10c08954E9313f58fE6BF8D4392eCEC"
-export const INVOICE_TOKEN_ADDRESS = "0x5740792930e185bc9763b9192754aE95181637C3"
-export const ARRANGER_CONDUIT_ADDRESS = "0x72911467D01dDC3559F3bF6360606Df4746dD04B"
-export const USDC_TOKEN_ADDRESS = "0x21cB4Bd2FD7c23fC83a072568B1362f73Db24203"
+export const INVOICE_FINANCER_ADDRESS =
+  "0xCadEcB2E007C6B0F64beC28a9DDf1657ba8B763B";
+export const STRATEGY_MANAGER_ADDRESS =
+  "0xfDE500Ef2277cA32ccDc9d21373251cb685d21DA";
+export const DAI_ADDRESS = "0xF255EB6728882d7626aEd7790D2999A79E5451ad";
+export const INVOICE_TOKEN_ADDRESS =
+  "0x008B7773E766D6e2299F16C3468554c9E586934a";
+export const ARRANGER_CONDUIT_ADDRESS =
+  "0xf1Bd1823A340C6d82434283666C5F610C6C5c08D";
+export const USDC_TOKEN_ADDRESS = "0xAaA88F3d38461cf34ccd7FA56a4D5E5ccDe2a604";
 
 // Deploying contracts with the account: 0xDC4bD7d0f8638Cb7d1Cb8CeBa1C3357869B8224D
-// Invoice contract deployed at: 0x5740792930e185bc9763b9192754aE95181637C3
-// Dai contract deployed at: 0x554cdbaba10c08954E9313f58fE6BF8D4392eCEC
-// Usdc contract deployed at: 0x21cB4Bd2FD7c23fC83a072568B1362f73Db24203
-// InvoiceTable contract deployed at: 0x6937883cee72d60357c8519C0b9CC21fc6f461A0
-// InvoiceTable created at: 0x6937883cee72d60357c8519C0b9CC21fc6f461A0
-// InvoiceFinancer contract deployed at: 0x5b266b4BD7D3515d0A754102086039b7DA8DF938
-// Roles contract deployed at: 0x706988357c61d3CaBd33ed63d0d11A39062E3b18
-// Registry contract deployed at: 0x360b656bD21bCB824c295e83cE300A28A90bcd6C
-// ArrangerConduit contract deployed at: 
-// StrategyManager contract deployed at: 0x42dd46872A14153b3CBd46ba43981e707c8B2f45
+// Invoice contract deployed at:
+// Dai contract deployed at:
+// Usdc contract deployed at:
+// InvoiceTable contract deployed at: 0x09Aa7e8a84F87f0aA13722c90D5ad18581E7dA2d
+// InvoiceTable created at: 0x09Aa7e8a84F87f0aA13722c90D5ad18581E7dA2d
+// InvoiceFinancer contract deployed at:
+// Roles contract deployed at: 0xF280E25b6a3bADd0a1a87747283c2b95eE41beC7
+// Registry contract deployed at: 0x9380b2835069e2Ac1eDdd10685763612f3d645F3
+// ArrangerConduit contract deployed at:
+// StrategyManager contract deployed at:

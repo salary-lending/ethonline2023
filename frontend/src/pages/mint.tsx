@@ -1,13 +1,16 @@
 import ApiKeyInput from "@/components/borrow/ApiKeyInput";
 import ShowInvoices from "@/components/borrow/ShowInvoices";
 import ShowInvoicesStep from "@/components/borrow/ShowInvoices";
+import { InvoiceFinancerABI } from "@/components/constants/abi";
+import { INVOICE_FINANCER_ADDRESS } from "@/components/constants/addresses";
 import { API_URL } from "@/components/constants/api";
 import { DEEL_TEST_INVOICES } from "@/components/constants/invoice_data";
 import { InvoiceType } from "@/components/types/invoice.type";
 import Heading from "@/components/ui/Heading";
 import { Card, CardBody } from "@nextui-org/react";
 import axios from "axios";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
+import { useContractRead } from "wagmi";
 
 type Props = {};
 
@@ -15,6 +18,16 @@ const MintPage = (props: Props) => {
   const [apiKey, setApiKey] = useState("");
   const [isFetching, setIsFetching] = useState(false);
   const [invoices, setInvoices] = useState<InvoiceType[]>(DEEL_TEST_INVOICES);
+
+  const {data:mintedInvoices} = useContractRead({
+    abi:InvoiceFinancerABI,
+    address:INVOICE_FINANCER_ADDRESS,
+    functionName:'getAllInvoices'
+  })
+
+  useEffect(()=>{
+    console.log({mintedInvoices})
+  },[mintedInvoices])
 
   const connectDeel = async () => {
     try { 
@@ -45,7 +58,7 @@ const MintPage = (props: Props) => {
             />
           </CardBody>
         </Card>
-        {invoices.length > 0 ? <ShowInvoices invoices={invoices} /> : null}
+        {invoices.length > 0 ? <ShowInvoices invoices={invoices} mintedInvoices={(mintedInvoices as any).map((it:any)=>it.invoiceId) as string[]} /> : null}
       </div>
     </>
   );

@@ -8,9 +8,10 @@ import MintModal from "./MintModal";
 
 type Props = {
   invoices: InvoiceType[];
+  mintedInvoices:string[]
 };
 
-const ShowInvoices = ({ invoices }: Props) => {
+const ShowInvoices = ({ invoices,mintedInvoices }: Props) => {
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
   const [selectedInvoice, setSelectedInvoice] = useState(
     {} as { invoiceId: string; amount: string }
@@ -41,6 +42,7 @@ const ShowInvoices = ({ invoices }: Props) => {
                 key={it.id}
                 invoice={it}
                 handleMintClick={handleMintClick}
+                isMinted={mintedInvoices.includes(it.id.toString())}
               />
             ))}
           </div>

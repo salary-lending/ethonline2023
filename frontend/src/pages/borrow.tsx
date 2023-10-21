@@ -64,16 +64,6 @@ const BorrowPage = () => {
         ],
       });
       toast.success("Approve Success");
-
-      const mintTx = await _mintDai({
-        args: [
-          STRATEGY_MANAGER_ADDRESS,
-          parseUnits(borrowAmount.toString(), 18),
-        ],
-      });
-
-
-      console.log("Minted dai", mintTx);
       const borrowTx = await _borrow({
         args: [DAI_ADDRESS, parseUnits(borrowAmount.toString(), 18)],
       });
