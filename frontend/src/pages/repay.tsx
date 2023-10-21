@@ -95,27 +95,27 @@ const RepayPage = (props: Props) => {
     try {
       setIsProcessing(true);
 
-      const approveDaiTx = await _approveDaiToken({
-        args: [STRATEGY_MANAGER_ADDRESS, selectedInvoice.amount],
-      });
-      const approveInvTx = await _approveInvoiceToken({
-        args: [INVOICE_FINANCER_ADDRESS, selectedInvoice.amount],
-      });
-      toast.success("Approved dai token");
+      // const approveDaiTx = await _approveDaiToken({
+      //   args: [STRATEGY_MANAGER_ADDRESS, selectedInvoice.amount],
+      // });
+      // const approveInvTx = await _approveInvoiceToken({
+      //   args: [INVOICE_FINANCER_ADDRESS, selectedInvoice.amount],
+      // });
+      // toast.success("Approved dai token");
 
-      await waitForConfirmation(10 * 1000);
-      console.log(selectedInvoice.amount, stakedTokens);
-      const repayTx = await _repay({
-        args: [DAI_ADDRESS, selectedInvoice.amount],
-      });
+      // await waitForConfirmation(10 * 1000);
+      // console.log(selectedInvoice.amount, stakedTokens);
+      // const repayTx = await _repay({
+      //   args: [DAI_ADDRESS, selectedInvoice.amount],
+      // });
 
-      await waitForConfirmation(10 * 1000);
+      // await waitForConfirmation(10 * 1000);
 
       const paidInvoice = await _payInvoice({
         args: [selectedInvoice.invoiceId, selectedInvoice.amount],
       });
-      console.log(repayTx);
-      setTxHash(repayTx.hash);
+      // console.log(repayTx);
+      // setTxHash(repayTx.hash);
       toast.success("Repaid Successfully");
     } catch (err: any) {
       console.log(err);

@@ -1,22 +1,22 @@
 export const INVOICE_FINANCER_ADDRESS =
-  "0x4CEd055B7E24200C038ce65B59b2CA58032c7320";
+  "0xb41e124CFF113F864B3B4933fb4C1dCa505B9eD8";
 export const STRATEGY_MANAGER_ADDRESS =
-  "0xe0CF999A0Bd4611B329a14f2a4649FF57D7db7A4";
-export const DAI_ADDRESS = "0xAb96b82723725347E43Ce38B3df2DEce1a51E9A3";
+  "0xEb67a2D49478C416249a0b26786EEA48Ad805824";
+export const DAI_ADDRESS = "0xE152b7Ff8758C14eD3ce3e63a381188Fd56961AD";
 export const INVOICE_TOKEN_ADDRESS =
-  "0xef92F826f72bC26b24e345fbE3f8a666f33De9D4";
-  export const USDC_TOKEN_ADDRESS = "0xB648b05F31B06F5F650295203F71A2665CEb2C53";
+  "0x46b2B9C9636e26196c19a84fEC149B14C43a0E00";
+export const USDC_TOKEN_ADDRESS = "0xc20854a19d6B375f199D4D93Cdeb6C1B5A4F7362";
 export const ARRANGER_CONDUIT_ADDRESS =
-  "0x2c99C76FF1334677A06aB36A2E3e1dE6c215533C";
+  "0x277757b60f017550B02a5b8Bff7d6d440fE195aF";
 
 // Deploying contracts with the account: 0xDC4bD7d0f8638Cb7d1Cb8CeBa1C3357869B8224D
-// Invoice contract deployed at: 
-// Dai contract deployed at: 
-// Usdc contract deployed at: 
-// InvoiceTable contract deployed at: 0xaF4761fa5A679ec1CD7116829fA51f15D3298431
-// InvoiceTable created at: 0xaF4761fa5A679ec1CD7116829fA51f15D3298431
-// InvoiceFinancer contract deployed at: 
-// Roles contract deployed at: 0xB3c1C179e69AE2c34e88E1c89a760f194FA6B88b
-// Registry contract deployed at: 0xba080Ed5C99BACf27a2D66f7A58643eAa8733076
-// ArrangerConduit contract deployed at: 
-// StrategyManager contract deployed at: 
+// Invoice contract deployed at:
+// Dai contract deployed at:
+// Usdc contract deployed at:
+// InvoiceTable contract deployed at: 0x2E3883e924096c1B7FA2EB0Ca11D55391ade17Bd
+// InvoiceTable created at: 0x2E3883e924096c1B7FA2EB0Ca11D55391ade17Bd
+// InvoiceFinancer contract deployed at: 0xb41e124CFF113F864B3B4933fb4C1dCa505B9eD8
+// Roles contract deployed at: 0x1D75d82aD129eEaB7184664829D816dd3506ce8E
+// Registry contract deployed at: 0xCA51Aa2e30914fA145f5009D97FcA6B001AABd4A
+// ArrangerConduit contract deployed at:
+// StrategyManager contract deployed at:
