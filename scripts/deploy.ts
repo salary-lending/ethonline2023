@@ -73,8 +73,6 @@ async function main() {
     true
   );
 
-
-
   const StrategyManager = await ethers.getContractFactory("StrategyManager");
   const strategyManager = await StrategyManager.deploy(
     invoiceToken.address,
@@ -83,14 +81,15 @@ async function main() {
     arrangerConduit.address,
     usdc.address
   );
-  await strategyManager.deployed()
-  console.log(`StrategyManager contract deployed at: ${strategyManager.address}`);
-
+  await strategyManager.deployed();
+  console.log(
+    `StrategyManager contract deployed at: ${strategyManager.address}`
+  );
 
   // Mint dai tokens
-  const amount = ethers.utils.parseEther("1000000")
+  const amount = ethers.utils.parseEther("1000000");
   const mintDai = await dai.mint(arrangerConduit.address, amount);
-  console.log("Successfully minted dai : ",amount,mintDai)
+  console.log("Successfully minted dai : ", amount, mintDai);
 }
 
 // We recommend this pattern to be able to use async/await everywhere
