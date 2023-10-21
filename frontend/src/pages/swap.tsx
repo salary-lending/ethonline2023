@@ -16,7 +16,7 @@ import { toast } from "sonner";
 import { parseUnits } from "viem";
 import { useAccount, useContractWrite } from "wagmi";
 import { TbArrowRight } from "react-icons/tb";
-import useTokenBalances from "@/components/stores/useTokenBalances";
+import useTokenBalances from "@/components/hooks/useTokenBalances";
 
 type Props = {};
 
@@ -180,6 +180,8 @@ const SwapPage = (props: Props) => {
             </div>
           </div>
           <Input
+          label={"Amount"}
+          labelPlacement="outside"
             value={amount.toString()}
             onChange={(e)=>setAmount(Number(e.target.value))}
             type="number"

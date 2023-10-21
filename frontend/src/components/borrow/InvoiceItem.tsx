@@ -9,15 +9,13 @@ import {
   Divider,
 } from "@nextui-org/react";
 import { BsArrowRight } from "react-icons/bs";
-import useBorrowFormState from "../stores/useBorrowStore";
 
-const InvoiceItem = (invoice: InvoiceType) => {
-  const { setSelectedInvoiceToMint, setCurrentStep } = useBorrowFormState();
-  
-  const handleOnMint = () => {
-    setSelectedInvoiceToMint(invoice);
-    setCurrentStep(2);
-  };
+type Props = {
+  invoice: InvoiceType;
+  handleMintClick: (invoiceId: string, amount: string) => void;
+};
+
+const InvoiceItem = ({ invoice, handleMintClick }: Props) => {
   return (
     <Card className="bg-default-100/50 group  hover:ring-primary hover:ring-1">
       <CardBody>
@@ -53,14 +51,20 @@ const InvoiceItem = (invoice: InvoiceType) => {
         </div>
       </CardBody>
       <Divider />
-      <CardFooter className="p-5 py-2.5 flex justify-between">
+      <CardFooter className="p-3 flex justify-between">
         <p className="font-medium text-lg text-success-600">
           <span className="font-heading text-default-600">Amount : </span>
           {` ${Number(invoice.total_amount).toFixed(2)} ${
             invoice.currency_code
           }`}
         </p>
-        <Button color="primary" variant="solid" onClick={handleOnMint}>
+        <Button
+          color="primary"
+          variant="solid"
+          onClick={() =>
+            handleMintClick(invoice.id.toString(), invoice.total_amount)
+          }
+        >
           Mint Token
         </Button>
       </CardFooter>

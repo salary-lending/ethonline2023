@@ -1,7 +1,8 @@
 import React, { useEffect } from "react";
 
 import { Card, CardBody } from "@nextui-org/react";
-import useTokenBalances from "./stores/useTokenBalances";
+import useTokenBalances from "./hooks/useTokenBalances";
+import { formatEther } from "viem";
 
 type Props = {};
 
@@ -18,16 +19,19 @@ const BalanceTracker = (props: Props) => {
               Invoice Token
             </p>
             <p className="text-2xl font-semibold">
-              {invoiceTokenBalance?.toString()} INV
+              {invoiceTokenBalance
+                ? formatEther(invoiceTokenBalance as bigint)
+                : 0}{" "}
+              INV
             </p>
           </div>
 
-          <div className="bg-default-100 border border-default-200/50 w-full p-3 rounded-xl">
+        <div className="bg-default-100 border border-default-200/50 w-full p-3 rounded-xl">
             <p className="font-medium text-default-500 font-heading">
               Dai Token
             </p>
             <p className="text-2xl font-semibold">
-              {daiTokenBalance?.toString()} DAI
+              {daiTokenBalance ? formatEther(daiTokenBalance as bigint) : 0} DAI
             </p>
           </div>
 
@@ -36,7 +40,10 @@ const BalanceTracker = (props: Props) => {
               Usdc Token
             </p>
             <p className="text-2xl font-semibold">
-              {usdcTokenBalance?.toString()} USDC
+              {usdcTokenBalance ? formatEther(usdcTokenBalance as bigint) : 0}{
+                " "
+              }
+              USDC
             </p>
           </div>
         </div>

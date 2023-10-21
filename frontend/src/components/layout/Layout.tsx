@@ -12,7 +12,7 @@ const Layout = (props: Props) => {
     <Providers>
       <main className={`flex min-h-screen flex-col `}>
         <Header />
-        <div className="z-0 w-full  flex-1 max-w-screen-lg mx-auto px-6 py-4">
+        <div className="z-0 w-full  flex-1 max-w-screen-lg mx-auto px-6 py-8">
           {props.children}
         </div>
       </main>
