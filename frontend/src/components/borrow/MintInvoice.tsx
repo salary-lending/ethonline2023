@@ -11,28 +11,34 @@ import {
 import Heading from "../ui/Heading";
 import { BsArrowRight } from "react-icons/bs";
 import { toast } from "sonner";
-import axios from "axios";
-import { API_URL } from "../constants/api";
 import { InvoiceType } from "../types/invoice.type";
+import { usePrepareContractWrite, useWalletClient } from "wagmi";
+import useInvoiceFinancer from "../hooks/useInvoiceFinancer";
+
 
 type Props = {};
 
 const MintInvoice = (props: Props) => {
   const [isMinting, setIsMinting] = useState(false);
-  const { setCurrentStep,setSelectedInvoiceToMint,selectedInvoiceToMint: invoice } = useBorrowFormState();
 
+  const {mintInvoice} = useInvoiceFinancer()
+
+  const {
+    setCurrentStep,
+    setSelectedInvoiceToMint,
+    selectedInvoiceToMint: invoice,
+  } = useBorrowFormState();
   const handleOnMint = async () => {
     try {
       setIsMinting(true);
       const data = {
-        invoiceId: invoice.id,
+        invoiceId: invoice.id.toString(),
         details: `${invoice.contract.title} ${invoice.description}`,
         amount: Number(invoice.total_amount),
       };
-      const mintRes = await axios.post(`${API_URL}/invoice/mint`, data);
-      console.log(mintRes);
-      setSelectedInvoiceToMint({} as InvoiceType)
-      setCurrentStep(1)
+      await mintInvoice(data)
+      setSelectedInvoiceToMint({} as InvoiceType);
+      setCurrentStep(1);
     } catch (err: any) {
       console.log(err);
       toast.error(err?.message ?? "Somethinge went wrong");

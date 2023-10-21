@@ -8,7 +8,7 @@ async function main() {
   const InvoiceToken = await ethers.getContractFactory("InvoiceToken");
   const invoiceToken = await InvoiceToken.deploy();
   await invoiceToken.deployed();
-  console.log(`ERC20Token contract deployed at: ${invoiceToken.address}`);
+  console.log(`Invoice contract deployed at: ${invoiceToken.address}`);
   // Save the contract address to a file
   fs.writeFileSync("./deployments/localhost/erc20.txt", invoiceToken.address);
 
@@ -74,14 +74,15 @@ async function main() {
   );
 
   const StrategyManager = await ethers.getContractFactory("StrategyManager");
-  await StrategyManager.deploy(
+  const strategyManager = await StrategyManager.deploy(
     invoiceToken.address,
     dai.address,
     invoiceFinancer.address,
     arrangerConduit.address,
     usdc.address
   );
-  console.log();
+  await strategyManager.deployed()
+  console.log(`StrategyManager contract deployed at: ${strategyManager.address}`);
 }
 
 // We recommend this pattern to be able to use async/await everywhere

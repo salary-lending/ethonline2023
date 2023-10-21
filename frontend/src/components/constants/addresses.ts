@@ -1,0 +1,18 @@
+export const INVOICE_FINANCER_ADDRESS = "0x5b266b4BD7D3515d0A754102086039b7DA8DF938"
+export const STRATEGY_MANAGER_ADDRESS = "0x42dd46872A14153b3CBd46ba43981e707c8B2f45"
+export const DAI_ADDRESS = "0x554cdbaba10c08954E9313f58fE6BF8D4392eCEC"
+export const INVOICE_TOKEN_ADDRESS = "0x5740792930e185bc9763b9192754aE95181637C3"
+export const ARRANGER_CONDUIT_ADDRESS = "0x72911467D01dDC3559F3bF6360606Df4746dD04B"
+export const USDC_TOKEN_ADDRESS = "0x21cB4Bd2FD7c23fC83a072568B1362f73Db24203"
+
+// Deploying contracts with the account: 0xDC4bD7d0f8638Cb7d1Cb8CeBa1C3357869B8224D
+// Invoice contract deployed at: 0x5740792930e185bc9763b9192754aE95181637C3
+// Dai contract deployed at: 0x554cdbaba10c08954E9313f58fE6BF8D4392eCEC
+// Usdc contract deployed at: 0x21cB4Bd2FD7c23fC83a072568B1362f73Db24203
+// InvoiceTable contract deployed at: 0x6937883cee72d60357c8519C0b9CC21fc6f461A0
+// InvoiceTable created at: 0x6937883cee72d60357c8519C0b9CC21fc6f461A0
+// InvoiceFinancer contract deployed at: 0x5b266b4BD7D3515d0A754102086039b7DA8DF938
+// Roles contract deployed at: 0x706988357c61d3CaBd33ed63d0d11A39062E3b18
+// Registry contract deployed at: 0x360b656bD21bCB824c295e83cE300A28A90bcd6C
+// ArrangerConduit contract deployed at: 
+// StrategyManager contract deployed at: 0x42dd46872A14153b3CBd46ba43981e707c8B2f45

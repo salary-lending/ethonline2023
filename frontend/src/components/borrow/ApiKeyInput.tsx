@@ -13,6 +13,7 @@ const ApiKeyInput = (props: Props) => {
   const { setApiKey, apiKey, setInvoices } = useDeelStore();
   const { setCurrentStep } = useBorrowFormState();
   const [isFetching, setIsFetching] = useState(false);
+  
   const handleSubmit = async () => {
     if (!apiKey) {
       toast.error("Invalid api key");
@@ -20,9 +21,9 @@ const ApiKeyInput = (props: Props) => {
     } else {
       try {
         setIsFetching(true);
-        const invoicesRes = await axios.get(`${API_URL}/deel/invoice`);
-        console.log(invoicesRes);
-        setInvoices(invoicesRes.data.data);
+        // const invoicesRes = await axios.get(`${API_URL}/deel/invoice`);
+        // console.log(invoicesRes);
+        // setInvoices(invoicesRes.data.data);
         setCurrentStep(1);
       } catch (err: any) {
         console.log(err);
