@@ -42,7 +42,7 @@ const ShowInvoices = ({ invoices,mintedInvoices }: Props) => {
                 key={it.id}
                 invoice={it}
                 handleMintClick={handleMintClick}
-                isMinted={mintedInvoices.includes(it.id.toString())}
+                isMinted={mintedInvoices?.includes(it.id.toString())}
               />
             ))}
           </div>
