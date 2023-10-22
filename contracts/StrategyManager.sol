@@ -8,7 +8,13 @@ import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "./InvoiceToken.sol";
 import "./InvoiceFinancer.sol";
 import "./ArrangerConduit.sol";
-// import "./V4SwapCaller.sol";
+
+// TODO: resolve import error
+// Error (2333): Identifier already declared.
+//   --> contracts/StrategyManager.sol:11:1:
+//    |
+// 11 | import "./V4SwapCaller.sol";
+import "./V4SwapCaller.sol";
 
 contract StrategyManager is ERC165, ReentrancyGuard {
     using SafeMath for uint256;
@@ -16,6 +22,7 @@ contract StrategyManager is ERC165, ReentrancyGuard {
     InvoiceToken public invoiceToken;
     InvoiceFinancer public invoiceFinancer;
     ArrangerConduit public arrangerConduit;
+    V4SwapCaller public v4SwapCaller;
 
     // the address of the stable coinin which dividend is paid
     IERC20 public daiToken;
@@ -81,7 +88,9 @@ contract StrategyManager is ERC165, ReentrancyGuard {
         emit Repay(msg.sender, asset, amount);
     }
 
-    // TODO
+    // TODO: 
+    // swap USDC to DAi -> use v4VerifierHook
+    // swap DAi to USDC
     function swap(address asset, uint256 amount) external nonReentrant {
         // should call uniswap v4 router to swap tokens DAI -> USDC and return USDC to the user
         // V4SwapCaller.swap();
