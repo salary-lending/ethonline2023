@@ -143,6 +143,7 @@ describe("InvoiceFinancer", function () {
       const invoiceDetailsPost = await invoiceFinancer.invoices("INV001");
       const statusPost = invoiceDetailsPost.status; // This will give you a number representing the status.
       console.log("statusPost", getStatusString(statusPost));
+      expect(statusPost).to.equal(2);
 
       const balance = await invoiceToken.balanceOf(addr2.address);
       const afterTokenBalance = await invoiceToken.totalSupply();
