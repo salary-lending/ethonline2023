@@ -12,7 +12,7 @@ dotenv.config();
 
 const ERC20_ADDRESS: string = "0xDc64a140Aa3E981100a9becA4E685f962f0cF6C9";
 const INVOICE_MINTER_ADDRESS: string =
-  "0xa513E6E4b8f2a923D98304ec87F64353C4D5C853";
+  "0x8A791620dd6260079BF849Dc5567aDC3F2FdC318";
 const DEEL_INVOICE_URL: string =
   "https://api-staging.letsdeel.com/rest/v1/contracts/nw9z5ww/invoice-adjustments";
 const deel_key: string = process.env.DEEL_KEY!;
@@ -20,13 +20,30 @@ const web3storage_key: string = process.env.WEB3STORAGE_KEY!;
 
 const app = express();
 
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 3001;
 
 const provider = new ethers.JsonRpcProvider("http://127.0.0.1:8545/");
 const wallet = new ethers.Wallet(
   "0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80",
   provider
 );
+
+const erc20Contract = new ethers.Contract(ERC20_ADDRESS, erc20ABI, wallet);
+const invoiceMinterContract = new ethers.Contract(
+  INVOICE_MINTER_ADDRESS,
+  invoiceMinterABI,
+  wallet
+);
+
+enum InvoiceStatus {
+  None = 0,
+  Financed = 1,
+  Paid = 2,
+}
+
+function getStatusString(statusNumber: number): string {
+  return InvoiceStatus[statusNumber];
+}
 
 // const signer = provider.getSigner();
 // const contract = new ethers.Contract(contractAddress, contractABI, signer);
@@ -53,6 +70,7 @@ const getData = (latest_invoice) => {
 interface Invoice {
   invoiceId: number;
   details: string;
+  status: string;
   amount: string;
 }
 
@@ -122,26 +140,53 @@ app.post("/invoice/mint", async (req, res) => {
 
 app.get("/invoice/minted", async (req, res) => {
   try {
+    const invoicesAll = await invoiceMinterContract.getAllInvoices();
+
+    let invoices: Invoice[] = [];
+    // Iterate over the invoices
+    for (let invoice of invoicesAll) {
+      console.log("invoice", invoice);
+      invoices.push({
+        invoiceId: invoice.invoiceId,
+        details: invoice.details,
+        status: getStatusString(invoice.status),
+        amount: ethers.formatUnits(invoice.amount, 18), // Assuming 18 decimals, adjust if needed
+      });
+    }
+
+    res.json({ invoices: invoices });
+  } catch (error: any) {
+    console.log("Error", error);
+    res.status(500).json({
+      status: "error",
+      message: error.message,
+    });
+  }
+});
+
+app.post("/invoice/pay", async (req, res) => {
+  try {
+    const { invoiceId, amount } = req.body;
+    console.log("invoiceId", invoiceId);
+
     const invoiceMinterContract = new ethers.Contract(
       INVOICE_MINTER_ADDRESS,
       invoiceMinterABI,
       wallet
     );
-    const invoicesCount = await invoiceMinterContract.getInvoicesCount();
-    console.log("invoicesCount", invoicesCount.toString());
+    const t1 = await erc20Contract.mint(wallet.address, amount);
+    await t1.wait();
+    const t2 = await erc20Contract.approve(INVOICE_MINTER_ADDRESS, amount);
+    await t2.wait();
+    const tx = await invoiceMinterContract.payInvoice(invoiceId, amount);
 
-    let invoices: Invoice[] = [];
-    for (let i = 0; i < invoicesCount; i++) {
-      const invoice = await invoiceMinterContract.invoicesArray(i);
-      console.log("invoice", invoice);
-      invoices.push({
-        invoiceId: invoice.invoiceId,
-        details: invoice.details,
-        amount: ethers.formatUnits(invoice.amount, 18), // Assuming 18 decimals, adjust if needed
-      });
-    }
+    await tx.wait();
 
-    res.json({ invoicesCount: invoicesCount.toString(), invoices: invoices });
+    res.json({
+      status: "success",
+      message: "Invoice paid successfully!",
+      mintedTokens: amount,
+    });
   } catch (error: any) {
     console.log("Error", error);
     res.status(500).json({
@@ -153,7 +198,6 @@ app.get("/invoice/minted", async (req, res) => {
 
 app.get("/invoice-tokens/balance", async (req, res) => {
   try {
-    const erc20Contract = new ethers.Contract(ERC20_ADDRESS, erc20ABI, wallet);
     const erc20Balance = await erc20Contract.totalSupply();
 
     res.json({
@@ -184,7 +228,7 @@ app.get("/invoice-tokens/balance", async (req, res) => {
 //   }
 // });
 
-app.listen(process.env.PORT || 3000, () => {
+app.listen(PORT, () => {
   console.log(`Server is running on http://localhost:${PORT}`);
 });
 

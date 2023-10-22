@@ -6,6 +6,8 @@ import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
 import "./InvoiceToken.sol";
+import "./Usdc.sol";
+import "./Dai.sol";
 import "./InvoiceFinancer.sol";
 import "./ArrangerConduit.sol";
 
@@ -23,9 +25,8 @@ contract StrategyManager is ERC165, ReentrancyGuard {
     InvoiceFinancer public invoiceFinancer;
     ArrangerConduit public arrangerConduit;
     V4SwapCaller public v4SwapCaller;
-
-    // the address of the stable coinin which dividend is paid
-    IERC20 public daiToken;
+    Usdc public usdc;
+    Dai public dai;
 
     mapping(address => uint256) public stakedSecurityTokens;
 
@@ -41,15 +42,17 @@ contract StrategyManager is ERC165, ReentrancyGuard {
         address _invoiceTokenAddress,
         address _dividendCurrency,
         address _invoiceFinancerAddress,
-        address _arrangerConduitAddress
+        address _arrangerConduitAddress,
+        address _usdcAddress
     ) {
         invoiceToken = InvoiceToken(_invoiceTokenAddress);
         invoiceFinancer = InvoiceFinancer(_invoiceFinancerAddress);
-        daiToken = IERC20(_dividendCurrency);
+        dai = Dai(_dividendCurrency);
         arrangerConduit = ArrangerConduit(_arrangerConduitAddress);
 
         // TODO: init UniswapPool
         // V4SwapCaller().init();
+        usdc = Usdc(_usdcAddress);
     }
 
     // /**
@@ -74,18 +77,31 @@ contract StrategyManager is ERC165, ReentrancyGuard {
     function borrow(address asset, uint256 amount) external nonReentrant {
         stakedSecurityTokens[msg.sender] += amount;
         arrangerConduit.deposit(msg.sender, address(invoiceToken), amount);
-        // arrangerConduit.drawFunds(address(daiToken), msg.sender, amount);
-        bool success = daiToken.transfer(msg.sender, amount);
+        arrangerConduit.drawFunds(address(dai), msg.sender, amount);
+        bool success = dai.transfer(msg.sender, amount);
         emit Borrow(msg.sender, asset, amount);
     }
 
-    function repay(address asset, uint256 amount) external nonReentrant {
+    function repay(uint256 invoiceId, uint256 amount) external nonReentrant {
         stakedSecurityTokens[msg.sender] -= amount;
-        // arrangerConduit.returnFunds(fundRequestId, amount);
-        // invoiceFinancer.payInvoice("1", amount);
-        bool success = daiToken.transferFrom(msg.sender, address(this), amount);
+        arrangerConduit.returnFunds(invoiceId, amount);
+        invoiceFinancer.payInvoice("1", amount);
+        bool success = dai.transferFrom(msg.sender, address(this), amount);
         invoiceToken.transfer(msg.sender, amount);
-        emit Repay(msg.sender, asset, amount);
+        emit Repay(msg.sender, address(invoiceToken), amount);
+    }
+
+    function swapUsdc(uint256 amount) external nonReentrant {
+        // TODO: implement
+        // should call uniswap v4 router to swap tokens DAI -> USDC and return USDC to the user
+        // and check if user has PolygonID minted
+        dai.transferFrom(msg.sender, address(this), amount);
+        usdc.mint(msg.sender, amount);
+    }
+
+    function swapDai(uint256 amount) external nonReentrant {
+        usdc.transferFrom(msg.sender, address(this), amount);
+        dai.mint(msg.sender, amount);
     }
 
     // TODO: 
@@ -93,7 +109,7 @@ contract StrategyManager is ERC165, ReentrancyGuard {
     // swap DAi to USDC
     function swap(address asset, uint256 amount) external nonReentrant {
         // should call uniswap v4 router to swap tokens DAI -> USDC and return USDC to the user
-        // V4SwapCaller.swap();
+        V4SwapCaller.swap();
         // and check if user has PolygonID minted
     }
 }

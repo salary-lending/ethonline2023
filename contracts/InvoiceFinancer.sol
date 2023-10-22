@@ -92,4 +92,8 @@ contract InvoiceFinancer {
     function getInvoicesCount() public view returns (uint256) {
         return invoicesArray.length;
     }
+
+    function getAllInvoices() public view returns (Invoice[] memory) {
+        return invoicesArray;
+    }
 }

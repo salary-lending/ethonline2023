@@ -8,13 +8,19 @@ async function main() {
   const InvoiceToken = await ethers.getContractFactory("InvoiceToken");
   const invoiceToken = await InvoiceToken.deploy();
   await invoiceToken.deployed();
-  console.log(`ERC20Token contract deployed at: ${invoiceToken.address}`);
+  console.log(`Invoice contract deployed at: ${invoiceToken.address}`);
   // Save the contract address to a file
+  fs.writeFileSync("./deployments/localhost/erc20.txt", invoiceToken.address);
 
   const Dai = await ethers.getContractFactory("Dai");
   const dai = await Dai.deploy();
   await dai.deployed();
-  fs.writeFileSync("./deployments/localhost/erc20.txt", invoiceToken.address);
+  console.log(`Dai contract deployed at: ${dai.address}`);
+
+  const Usdc = await ethers.getContractFactory("Usdc");
+  const usdc = await Usdc.deploy();
+  await usdc.deployed();
+  console.log(`Usdc contract deployed at: ${usdc.address}`);
 
   // Deploy the InvoiceTable contract
   const InvoiceTable = await ethers.getContractFactory("InvoiceTable");
@@ -68,13 +74,26 @@ async function main() {
   );
 
   const StrategyManager = await ethers.getContractFactory("StrategyManager");
-  await StrategyManager.deploy(
+  const strategyManager = await StrategyManager.deploy(
     invoiceToken.address,
     dai.address,
     invoiceFinancer.address,
-    arrangerConduit.address
+    arrangerConduit.address,
+    usdc.address
   );
-  console.log();
+  await strategyManager.deployed();
+  console.log(
+    `StrategyManager contract deployed at: ${strategyManager.address}`
+  );
+
+  // Mint dai tokens
+  const amount = ethers.utils.parseEther("1000000");
+
+  const mintDai = await dai.mint(strategyManager.address, amount);
+  console.log("Successfully minted dai : ", amount);
+
+  const mintInv = await invoiceToken.mint(strategyManager.address, amount);
+  console.log("Successfully minted inv : ", amount);
 }
 
 // We recommend this pattern to be able to use async/await everywhere

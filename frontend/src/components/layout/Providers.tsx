@@ -4,7 +4,7 @@ import { Toaster } from "sonner";
 const Providers = ({ children }: { children: React.ReactNode }) => {
   return (
     <NextUIProvider>
-      <Toaster richColors  />
+      <Toaster richColors theme="dark" />
       {children}
     </NextUIProvider>
   );
