@@ -6,6 +6,11 @@ export const invoiceMinterABI = [
         name: "_invoiceTokenAddress",
         type: "address",
       },
+      {
+        internalType: "address",
+        name: "_invoiceTableAddress",
+        type: "address",
+      },
     ],
     stateMutability: "nonpayable",
     type: "constructor",
@@ -56,6 +61,46 @@ export const invoiceMinterABI = [
     name: "financeInvoice",
     outputs: [],
     stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    inputs: [],
+    name: "getAllInvoices",
+    outputs: [
+      {
+        components: [
+          {
+            internalType: "string",
+            name: "invoiceId",
+            type: "string",
+          },
+          {
+            internalType: "uint256",
+            name: "amount",
+            type: "uint256",
+          },
+          {
+            internalType: "enum InvoiceFinancer.InvoiceStatus",
+            name: "status",
+            type: "uint8",
+          },
+          {
+            internalType: "string",
+            name: "details",
+            type: "string",
+          },
+          {
+            internalType: "address",
+            name: "financedBy",
+            type: "address",
+          },
+        ],
+        internalType: "struct InvoiceFinancer.Invoice[]",
+        name: "",
+        type: "tuple[]",
+      },
+    ],
+    stateMutability: "view",
     type: "function",
   },
   {
@@ -114,6 +159,11 @@ export const invoiceMinterABI = [
     name: "invoices",
     outputs: [
       {
+        internalType: "string",
+        name: "invoiceId",
+        type: "string",
+      },
+      {
         internalType: "uint256",
         name: "amount",
         type: "uint256",
@@ -147,6 +197,11 @@ export const invoiceMinterABI = [
     ],
     name: "invoicesArray",
     outputs: [
+      {
+        internalType: "string",
+        name: "invoiceId",
+        type: "string",
+      },
       {
         internalType: "uint256",
         name: "amount",

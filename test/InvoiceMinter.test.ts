@@ -120,7 +120,19 @@ describe("InvoiceFinancer", function () {
       await invoiceToken
         .connect(addr2)
         .approve(invoiceFinancer.address, paymentAmount);
+      const invoicePre = await invoiceFinancer.invoicesArray(0);
+      console.log("invoicePre", invoicePre);
+      const invoiceDetails = await invoiceFinancer.invoices("INV001");
+      const status = invoiceDetails.status; // This will give you a number representing the status.
+      console.log("status", status);
+
       await invoiceFinancer.connect(addr2).payInvoice("INV001", paymentAmount);
+
+      const invoice = await invoiceFinancer.invoicesArray(0);
+      console.log("invoice", invoice);
+      const invoiceDetailsPost = await invoiceFinancer.invoices("INV001");
+      const statusPost = invoiceDetailsPost.status; // This will give you a number representing the status.
+      console.log("statusPost", statusPost);
 
       const balance = await invoiceToken.balanceOf(addr2.address);
       const afterTokenBalance = await invoiceToken.totalSupply();
