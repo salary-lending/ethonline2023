@@ -1,8 +1,16 @@
 import ApiKeyInput from "@/components/borrow/ApiKeyInput";
 import ShowInvoices from "@/components/borrow/ShowInvoices";
 import ShowInvoicesStep from "@/components/borrow/ShowInvoices";
-import { DaiABI, InvoiceFinancerABI, InvoiceTokenABI } from "@/components/constants/abi";
-import { DAI_ADDRESS, INVOICE_FINANCER_ADDRESS, INVOICE_TOKEN_ADDRESS } from "@/components/constants/addresses";
+import {
+  DaiABI,
+  InvoiceFinancerABI,
+  InvoiceTokenABI,
+} from "@/components/constants/abi";
+import {
+  DAI_ADDRESS,
+  INVOICE_FINANCER_ADDRESS,
+  INVOICE_TOKEN_ADDRESS,
+} from "@/components/constants/addresses";
 import { API_URL } from "@/components/constants/api";
 import { DEEL_TEST_INVOICES } from "@/components/constants/invoice_data";
 import { InvoiceType } from "@/components/types/invoice.type";
@@ -20,13 +28,11 @@ const MintPage = (props: Props) => {
   const [invoices, setInvoices] = useState<InvoiceType[]>([]);
   const {address} = useAccount()
 
-  const {data:mintedInvoices} = useContractRead({
-    abi:InvoiceFinancerABI,
-    address:INVOICE_FINANCER_ADDRESS,
-    functionName:'getAllInvoices'
-  })
-
-
+  const { data: mintedInvoices } = useContractRead({
+    abi: InvoiceFinancerABI,
+    address: INVOICE_FINANCER_ADDRESS,
+    functionName: "getAllInvoices",
+  });
 
   const connectDeel = async () => {
     try { 
@@ -35,9 +41,9 @@ const MintPage = (props: Props) => {
       console.log(res.data)
       setInvoices(res.data.data)
     } catch (err) {
-      console.log(err)
+      console.log(err);
     } finally {
-      setIsFetching(false)
+      setIsFetching(false);
     }
   };
   return (
@@ -57,7 +63,16 @@ const MintPage = (props: Props) => {
             />
           </CardBody>
         </Card>
-        {invoices.length > 0 ? <ShowInvoices invoices={invoices} mintedInvoices={(mintedInvoices as any)?.map((it:any)=>it.invoiceId) as string[]} /> : null}
+        {invoices.length > 0 ? (
+          <ShowInvoices
+            invoices={invoices}
+            mintedInvoices={
+              (mintedInvoices as any)?.map(
+                (it: any) => it.invoiceId
+              ) as string[]
+            }
+          />
+        ) : null}
       </div>
     </>
   );

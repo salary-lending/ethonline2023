@@ -27,10 +27,8 @@ import { toast } from "sonner";
 import { formatEther, parseUnits } from "viem";
 import { Address, useAccount, useContractRead, useContractWrite } from "wagmi";
 
-
-const waitForConfirmation = (ms:number) => new Promise(
-  resolve => setTimeout(resolve, ms)
-);
+const waitForConfirmation = (ms: number) =>
+  new Promise((resolve) => setTimeout(resolve, ms));
 
 const BorrowPage = () => {
   const { invoiceTokenBalance } = useTokenBalances();
@@ -43,7 +41,6 @@ const BorrowPage = () => {
     abi: DaiABI,
     functionName: "mint",
   });
-
 
   const { writeAsync: _borrow } = useContractWrite({
     address: STRATEGY_MANAGER_ADDRESS,
@@ -59,12 +56,12 @@ const BorrowPage = () => {
     account: address,
   });
 
-  const {data:stakedTokens} = useContractRead({
-    address:STRATEGY_MANAGER_ADDRESS,
-    abi:StrategyManagerABI,
-    functionName:'stakedSecurityTokens',
-    args:[address]
-  })
+  const { data: stakedTokens } = useContractRead({
+    address: STRATEGY_MANAGER_ADDRESS,
+    abi: StrategyManagerABI,
+    functionName: "stakedSecurityTokens",
+    args: [address],
+  });
   const borrow = async () => {
     try {
       setIsProcessing(true);
@@ -76,7 +73,7 @@ const BorrowPage = () => {
       });
       toast.success("Approve Success");
       // 10 sec st for confirmation of approve transaction
-      
+
       const borrowTx = await _borrow({
         args: [DAI_ADDRESS, parseUnits(borrowAmount.toString(), 18)],
       });
@@ -97,7 +94,7 @@ const BorrowPage = () => {
           <CardBody>
             <Heading text="Borrow" />
             <p className="text-lg text-default-500">
-              Stake your invoice tokens to borrow dai tokens .
+              Deposit to MakerDao Conduit and borrow DAI.
             </p>
             <div className="flex gap-4 my-4">
               <div className="bg-default-100 shadow-small p-3 w-full px-5 rounded-xl">
@@ -111,7 +108,9 @@ const BorrowPage = () => {
               </div>
               <div className="bg-default-100 shadow-small p-3 w-full px-5 rounded-xl">
                 <p className="text-default-500">Total Staked tokens</p>
-                <p className="uppercase text-2xl  font-semibold">{stakedTokens ? formatEther(stakedTokens as bigint) : 0} INV</p>
+                <p className="uppercase text-2xl  font-semibold">
+                  {stakedTokens ? formatEther(stakedTokens as bigint) : 0} INV
+                </p>
               </div>
             </div>
             <div className="bg-default-100 shadow-small p-3 w-full px-5 rounded-xl">
@@ -140,7 +139,7 @@ const BorrowPage = () => {
             >
               {isProcessing ? "Processing..." : "Borrow"}
             </Button>
-            <ShowTx hash={txHash} className="mt-4 bg-default-100/50"/>
+            <ShowTx hash={txHash} className="mt-4 bg-default-100/50" />
           </CardBody>
 
           <Divider />
