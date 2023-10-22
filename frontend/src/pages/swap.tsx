@@ -1,6 +1,15 @@
 import BalanceTracker from "@/components/BalanceTracker";
-import { DaiABI, StrategyManagerABI, UsdcTokenABI } from "@/components/constants/abi";
-import { ARRANGER_CONDUIT_ADDRESS, DAI_ADDRESS, STRATEGY_MANAGER_ADDRESS, USDC_TOKEN_ADDRESS } from "@/components/constants/addresses";
+import {
+  DaiABI,
+  StrategyManagerABI,
+  UsdcTokenABI,
+} from "@/components/constants/abi";
+import {
+  ARRANGER_CONDUIT_ADDRESS,
+  DAI_ADDRESS,
+  STRATEGY_MANAGER_ADDRESS,
+  USDC_TOKEN_ADDRESS,
+} from "@/components/constants/addresses";
 import Heading from "@/components/ui/Heading";
 import {
   Input,
@@ -26,7 +35,7 @@ const SwapPage = (props: Props) => {
     from: "usdc",
     to: "dai",
   });
-  const {daiTokenBalance,usdcTokenBalance} = useTokenBalances()
+  const { daiTokenBalance, usdcTokenBalance } = useTokenBalances();
 
   const [processing, setProcessing] = useState(false);
   const [amount, setAmount] = useState(0);
@@ -49,17 +58,15 @@ const SwapPage = (props: Props) => {
     address: DAI_ADDRESS,
     abi: DaiABI,
     functionName: "approve",
-    account:address
+    account: address,
   });
 
   const { writeAsync: _approveUsdc } = useContractWrite({
     address: USDC_TOKEN_ADDRESS,
     abi: UsdcTokenABI,
     functionName: "approve",
-    account:address
+    account: address,
   });
-
-
 
   const swapUsdc = async () => {
     try {
@@ -73,13 +80,15 @@ const SwapPage = (props: Props) => {
         throw new Error("Amount cannot be less than 0");
       }
       // check dai balance
-      if(amount > Number(daiTokenBalance?.toString())){
-        throw new Error("Insufficient balance")
+      if (amount > Number(daiTokenBalance?.toString())) {
+        throw new Error("Insufficient balance");
       }
       setProcessing(true);
-      await _approveUsdc({args:[address, parseUnits(amount.toString(),18)]})
+      await _approveDai({
+        args: [STRATEGY_MANAGER_ADDRESS, parseUnits(amount.toString(), 18)],
+      });
       // await _approveUsdc({args:[ARRANGER_CONDUIT_ADDRESS,parseUnits(amount.toString(),18)]})
-      
+
       const swapTx = await _swapUsdc({
         args: [parseUnits(amount.toString(), 18)],
       });
@@ -101,7 +110,6 @@ const SwapPage = (props: Props) => {
       setProcessing(true);
       if (amount === 0) {
         throw new Error("Amount cannot be 0");
-
       }
 
       if (amount < 0) {
@@ -109,12 +117,14 @@ const SwapPage = (props: Props) => {
       }
 
       // check usdc Balance
-      if(amount > Number(usdcTokenBalance?.toString())){
-        throw new Error("Insufficient balance")
+      if (amount > Number(usdcTokenBalance?.toString())) {
+        throw new Error("Insufficient balance");
       }
 
       // await _approveDai({args:[STRATEGY_MANAGER_ADDRESS, parseUnits(amount.toString(),18)]})
-      // await _approveUsdc({args:[, parseUnits(amount.toString(),18)]})
+      await _approveUsdc({
+        args: [STRATEGY_MANAGER_ADDRESS, parseUnits(amount.toString(), 18)],
+      });
 
       const swapTx = await _swapDai({
         args: [parseUnits(amount.toString(), 18)],
@@ -146,7 +156,6 @@ const SwapPage = (props: Props) => {
             <Tabs
               radius="full"
               color="primary"
-
               onSelectionChange={(key) => {
                 if (key === "usdc-dai") {
                   setState({
@@ -184,10 +193,10 @@ const SwapPage = (props: Props) => {
             </div>
           </div>
           <Input
-          label={"Amount"}
-          labelPlacement="outside"
+            label={"Amount"}
+            labelPlacement="outside"
             value={amount.toString()}
-            onChange={(e)=>setAmount(Number(e.target.value))}
+            onChange={(e) => setAmount(Number(e.target.value))}
             type="number"
             placeholder={`Enter ${state.from} amount `}
             size="lg"
@@ -197,17 +206,23 @@ const SwapPage = (props: Props) => {
               inputWrapper: "h-16",
             }}
           />
-          <Button size='lg' isLoading={processing } color="primary" className="h-16 mt-4 text-xl font-medium" 
-          onClick={async ()=>{
-            if(state.to === 'usdc'){
-              await swapUsdc()
-            } 
-            if(state.to === 'dai'){
-              await swapDai()
-            }
-            
-          }}>
-            {processing ? "Processing..." : `Swap to get ${state.to.toUpperCase()}`}
+          <Button
+            size="lg"
+            isLoading={processing}
+            color="primary"
+            className="h-16 mt-4 text-xl font-medium"
+            onClick={async () => {
+              if (state.to === "usdc") {
+                await swapUsdc();
+              }
+              if (state.to === "dai") {
+                await swapDai();
+              }
+            }}
+          >
+            {processing
+              ? "Processing..."
+              : `Swap to get ${state.to.toUpperCase()}`}
           </Button>
         </CardBody>
       </Card>
