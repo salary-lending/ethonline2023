@@ -11,12 +11,20 @@ import "./Dai.sol";
 import "./InvoiceFinancer.sol";
 import "./ArrangerConduit.sol";
 
+// TODO: resolve import error
+// Error (2333): Identifier already declared.
+//   --> contracts/StrategyManager.sol:11:1:
+//    |
+// 11 | import "./V4SwapCaller.sol";
+import "./V4SwapCaller.sol";
+
 contract StrategyManager is ERC165, ReentrancyGuard {
     using SafeMath for uint256;
 
     InvoiceToken public invoiceToken;
     InvoiceFinancer public invoiceFinancer;
     ArrangerConduit public arrangerConduit;
+    V4SwapCaller public v4SwapCaller;
     Usdc public usdc;
     Dai public dai;
 
@@ -41,6 +49,9 @@ contract StrategyManager is ERC165, ReentrancyGuard {
         invoiceFinancer = InvoiceFinancer(_invoiceFinancerAddress);
         dai = Dai(_dividendCurrency);
         arrangerConduit = ArrangerConduit(_arrangerConduitAddress);
+
+        // TODO: init UniswapPool
+        // V4SwapCaller().init();
         usdc = Usdc(_usdcAddress);
     }
 
@@ -91,5 +102,14 @@ contract StrategyManager is ERC165, ReentrancyGuard {
     function swapDai(uint256 amount) external nonReentrant {
         usdc.transferFrom(msg.sender, address(this), amount);
         dai.mint(msg.sender, amount);
+    }
+
+    // TODO: 
+    // swap USDC to DAi -> use v4VerifierHook
+    // swap DAi to USDC
+    function swap(address asset, uint256 amount) external nonReentrant {
+        // should call uniswap v4 router to swap tokens DAI -> USDC and return USDC to the user
+        V4SwapCaller.swap();
+        // and check if user has PolygonID minted
     }
 }
