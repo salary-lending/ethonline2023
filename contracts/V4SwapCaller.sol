@@ -24,7 +24,7 @@ import {VerifierHook} from "./VerifierHook.sol";
 
 
 // @notice: Usage of V4SwapCaller: same in VerifierHookTest
-// For operation test, run  setup()
+// For operation test, run v4PoolSetUp() with 2 token_address
 
 contract V4SwapCaller is HookTest, Deployers, GasSnapshot{
     using PoolIdLibrary for PoolKey;
@@ -36,7 +36,7 @@ contract V4SwapCaller is HookTest, Deployers, GasSnapshot{
 
     error InvalidSwapAmount();
 
-    function setUp() public {
+    function v4PoolSetUp(address token0_addr, address token1_addr) public {
         // creates the pool manager, test tokens, and other utility routers
         HookTest.initHookTestEnv();
 
@@ -51,14 +51,14 @@ contract V4SwapCaller is HookTest, Deployers, GasSnapshot{
         require(address(verifierHook) == hookAddress, "VerifierHookTest: hook address mismatch");
 
         // Create the pool
-        // token0, token1 is declared in HookTest.sol
+        // token0, token1 is declared in HookTest.sol -> will orverride
         // PoolKey params:
         // - The lower currency
         // - The higher currency
         // - The pool swap fee
         // - Ticks
         // - Hook
-        poolKey = PoolKey(Currency.wrap(address(token0)), Currency.wrap(address(token1)), 3000, 60, IHooks(verifierHook));
+        poolKey = PoolKey(Currency.wrap(token0_addr), Currency.wrap(token1_addr), 3000, 60, IHooks(verifierHook));
         poolId = poolKey.toId();
         manager.initialize(poolKey, SQRT_RATIO_1_1, "");
 
@@ -77,9 +77,12 @@ contract V4SwapCaller is HookTest, Deployers, GasSnapshot{
             IPoolManager.ModifyPositionParams(TickMath.minUsableTick(60), TickMath.maxUsableTick(60), 10 ether),
             ""
         );
+
+        // approve
+        approve(token0_addr, token1_addr);
     }
 
-    function approve(address token0, address token1, uint256 amount0, uint256 amount1) internal {
+    function approve(address token0_addr, address token1_addr, uint256 amount0, uint256 amount1) internal {
         ERC20(token0).approve(address(swapRouter), amount0);
         ERC20(token1).approve(address(swapRouter), amount1);
     }
