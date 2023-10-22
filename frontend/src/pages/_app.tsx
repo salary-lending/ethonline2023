@@ -3,7 +3,7 @@ import type { AppProps } from "next/app";
 import { createWeb3Modal, defaultWagmiConfig } from "@web3modal/wagmi/react";
 
 import { WagmiConfig, sepolia } from "wagmi";
-import { arbitrum, goerli, localhost, mainnet } from "wagmi/chains";
+import { arbitrum, goerli, mainnet } from "wagmi/chains";
 import Layout from "@/components/layout/Layout";
 import { useEffect, useState } from "react";
 import { Spinner } from "@nextui-org/react";
@@ -17,7 +17,19 @@ const metadata = {
   icons: ["https://avatars.githubusercontent.com/u/37784886"],
 };
 
-const chains = [sepolia, goerli, localhost];
+const localhost = { id: 31337,
+  name: 'Localhost',
+  network: 'localhost',
+  nativeCurrency: {
+    decimals: 18,
+    name: 'Ether',
+    symbol: 'ETH',
+  },
+  rpcUrls: {
+    default: { http: ['http://127.0.0.1:8545'] },
+    public: { http: ['http://127.0.0.1:8545'] },
+  },}
+const chains = [sepolia, goerli,localhost];
 const wagmiConfig = defaultWagmiConfig({
   chains,
   projectId: walletConnectProjectId,

@@ -88,13 +88,12 @@ async function main() {
 
   // Mint dai tokens
   const amount = ethers.utils.parseEther("1000000");
-  const mintDai = await dai.mint(arrangerConduit.address, amount);
-  console.log("Successfully minted dai : ", amount, mintDai);
 
-  // Mint dai tokens
-  const sAmount = ethers.utils.parseEther("1000000");
-  const sMintDai = await dai.mint(strategyManager.address, sAmount);
-  console.log("Successfully minted dai : ", amount, sMintDai);
+  const mintDai = await dai.mint(strategyManager.address, amount);
+  console.log("Successfully minted dai : ", amount);
+
+  const mintInv = await invoiceToken.mint(strategyManager.address, amount);
+  console.log("Successfully minted inv : ", amount);
 }
 
 // We recommend this pattern to be able to use async/await everywhere

@@ -77,8 +77,9 @@ const SwapPage = (props: Props) => {
         throw new Error("Insufficient balance")
       }
       setProcessing(true);
-      // await _approveDai({args:[STRATEGY_MANAGER_ADDRESS, parseUnits(amount.toString(),18)]})
-      // await _approveDai({args:[ARRANGER_CONDUIT_ADDRESS,parseUnits(amount.toString(),18)]})
+      await _approveUsdc({args:[address, parseUnits(amount.toString(),18)]})
+      // await _approveUsdc({args:[ARRANGER_CONDUIT_ADDRESS,parseUnits(amount.toString(),18)]})
+      
       const swapTx = await _swapUsdc({
         args: [parseUnits(amount.toString(), 18)],
       });
@@ -111,6 +112,9 @@ const SwapPage = (props: Props) => {
       if(amount > Number(usdcTokenBalance?.toString())){
         throw new Error("Insufficient balance")
       }
+
+      // await _approveDai({args:[STRATEGY_MANAGER_ADDRESS, parseUnits(amount.toString(),18)]})
+      // await _approveUsdc({args:[, parseUnits(amount.toString(),18)]})
 
       const swapTx = await _swapDai({
         args: [parseUnits(amount.toString(), 18)],

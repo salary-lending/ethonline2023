@@ -25,8 +25,12 @@ import Link from "next/link";
 import { useState } from "react";
 import { toast } from "sonner";
 import { formatEther, parseUnits } from "viem";
-import { Address, useAccount, useContractWrite } from "wagmi";
+import { Address, useAccount, useContractRead, useContractWrite } from "wagmi";
 
+
+const waitForConfirmation = (ms:number) => new Promise(
+  resolve => setTimeout(resolve, ms)
+);
 
 const BorrowPage = () => {
   const { invoiceTokenBalance } = useTokenBalances();
@@ -39,6 +43,7 @@ const BorrowPage = () => {
     abi: DaiABI,
     functionName: "mint",
   });
+
 
   const { writeAsync: _borrow } = useContractWrite({
     address: STRATEGY_MANAGER_ADDRESS,
@@ -54,6 +59,12 @@ const BorrowPage = () => {
     account: address,
   });
 
+  const {data:stakedTokens} = useContractRead({
+    address:STRATEGY_MANAGER_ADDRESS,
+    abi:StrategyManagerABI,
+    functionName:'stakedSecurityTokens',
+    args:[address]
+  })
   const borrow = async () => {
     try {
       setIsProcessing(true);
@@ -64,6 +75,9 @@ const BorrowPage = () => {
         ],
       });
       toast.success("Approve Success");
+      // 10 sec st for confirmation of approve transaction
+      await waitForConfirmation(1000*20)
+      
       const borrowTx = await _borrow({
         args: [DAI_ADDRESS, parseUnits(borrowAmount.toString(), 18)],
       });
@@ -98,7 +112,7 @@ const BorrowPage = () => {
               </div>
               <div className="bg-default-100 p-3 w-full px-5 rounded-xl">
                 <p className="text-default-500">Total Staked tokens</p>
-                <p className="uppercase text-2xl  font-semibold">TBA</p>
+                <p className="uppercase text-2xl  font-semibold">{stakedTokens ? formatEther(stakedTokens as bigint) : 0} INV</p>
               </div>
             </div>
             <div className="bg-default-100 p-3 w-full px-5 rounded-xl">

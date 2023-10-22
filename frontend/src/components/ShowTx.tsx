@@ -17,7 +17,7 @@ const ShowTx = ({ hash,className }: { hash: string ,className?:string }) => {
           isExternal
           showAnchorIcon
           color="success"
-          href={`https://sepolia.etherscan.io/${hash}`}
+          href={`https://sepolia.etherscan.io/tx/${hash}`}
         >
           See in explorer
         </Link>
