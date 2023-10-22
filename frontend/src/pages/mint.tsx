@@ -25,8 +25,8 @@ type Props = {};
 const MintPage = (props: Props) => {
   const [apiKey, setApiKey] = useState("");
   const [isFetching, setIsFetching] = useState(false);
-  const [invoices, setInvoices] = useState<InvoiceType[]>(DEEL_TEST_INVOICES);
-  const { address } = useAccount();
+  const [invoices, setInvoices] = useState<InvoiceType[]>([]);
+  const {address} = useAccount()
 
   const { data: mintedInvoices } = useContractRead({
     abi: InvoiceFinancerABI,
@@ -34,17 +34,12 @@ const MintPage = (props: Props) => {
     functionName: "getAllInvoices",
   });
 
-  useEffect(() => {
-    console.log({ mintedInvoices });
-  }, [mintedInvoices]);
-
   const connectDeel = async () => {
-    try {
-      setIsFetching(true);
-
-      const res = await axios.get(`${API_URL}/deel/invoice`);
-      console.log("reponse data deel", res.data);
-      setInvoices(res.data.data);
+    try { 
+      setIsFetching(true)
+      const res = await axios.get(`${API_URL}/deel/invoice`)
+      console.log(res.data)
+      setInvoices(res.data.data)
     } catch (err) {
       console.log(err);
     } finally {
@@ -64,6 +59,7 @@ const MintPage = (props: Props) => {
               apiKey={apiKey}
               setApiKey={setApiKey}
               handleSubmit={connectDeel}
+              isFetching={isFetching}
             />
           </CardBody>
         </Card>

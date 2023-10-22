@@ -101,15 +101,13 @@ const RepayPage = (props: Props) => {
       const approveInvTx = await _approveInvoiceToken({
         args: [INVOICE_FINANCER_ADDRESS, selectedInvoice.amount],
       });
-      toast.success("Approved dai token");
+      toast.success("Approved usdc token");
 
-      await waitForConfirmation(10 * 1000);
       console.log(selectedInvoice.amount, stakedTokens);
       const repayTx = await _repay({
         args: [DAI_ADDRESS, selectedInvoice.amount],
       });
 
-      await waitForConfirmation(10 * 1000);
 
       const paidInvoice = await _payInvoice({
         args: [selectedInvoice.invoiceId, selectedInvoice.amount],
@@ -136,6 +134,7 @@ const RepayPage = (props: Props) => {
                 Repay borrowed dai tokens
               </p>
               <Select
+              variant="faded"
                 label="Select Invoice to Repay"
                 placeholder="Select Invoice to repay"
                 className="max-w-xs mt-4"

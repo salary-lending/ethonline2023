@@ -73,7 +73,6 @@ const BorrowPage = () => {
       });
       toast.success("Approve Success");
       // 10 sec st for confirmation of approve transaction
-      await waitForConfirmation(1000 * 20);
 
       const borrowTx = await _borrow({
         args: [DAI_ADDRESS, parseUnits(borrowAmount.toString(), 18)],
@@ -98,7 +97,7 @@ const BorrowPage = () => {
               Deposit to MakerDao Conduit and borrow DAI.
             </p>
             <div className="flex gap-4 my-4">
-              <div className="bg-default-100 p-3 w-full px-5 rounded-xl">
+              <div className="bg-default-100 shadow-small p-3 w-full px-5 rounded-xl">
                 <p className="text-default-500">You can borrow</p>
                 <p className="uppercase text-2xl  font-semibold">
                   {invoiceTokenBalance
@@ -107,18 +106,19 @@ const BorrowPage = () => {
                   DAI
                 </p>
               </div>
-              <div className="bg-default-100 p-3 w-full px-5 rounded-xl">
+              <div className="bg-default-100 shadow-small p-3 w-full px-5 rounded-xl">
                 <p className="text-default-500">Total Staked tokens</p>
                 <p className="uppercase text-2xl  font-semibold">
                   {stakedTokens ? formatEther(stakedTokens as bigint) : 0} INV
                 </p>
               </div>
             </div>
-            <div className="bg-default-100 p-3 w-full px-5 rounded-xl">
+            <div className="bg-default-100 shadow-small p-3 w-full px-5 rounded-xl">
               <p className="text-3xl font-medium text-center">
                 {borrowAmount} DAI
               </p>
               <Input
+
                 value={borrowAmount.toString()}
                 onChange={(e) => setBorrowAmount(Number(e.target.value))}
                 type="range"
