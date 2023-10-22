@@ -17,6 +17,7 @@ import {IHooks} from "@uniswap/v4-core/contracts/interfaces/IHooks.sol";
 import {Hooks} from "@uniswap/v4-core/contracts/libraries/Hooks.sol";
 import {PoolModifyPositionTest} from "@uniswap/v4-core/contracts/test/PoolModifyPositionTest.sol";
 import {PoolSwapTest} from "@uniswap/v4-core/contracts/test/PoolSwapTest.sol";
+import {TestERC20} from "@uniswap/v4-core/contracts/test/TestERC20.sol";
 
 import {HookTest} from "./swapTest/swapUtils/HookTest.sol";
 import {HookMiner} from "./swapTest/swapUtils/HookMiner.sol";
@@ -79,12 +80,13 @@ contract V4SwapCaller is HookTest, Deployers, GasSnapshot{
         );
 
         // approve
-        approve(token0_addr, token1_addr);
+        // TODO: update amount
+        approve(token0_addr, token1_addr, 10 ether, 10 ether);
     }
 
     function approve(address token0_addr, address token1_addr, uint256 amount0, uint256 amount1) internal {
-        ERC20(token0).approve(address(swapRouter), amount0);
-        ERC20(token1).approve(address(swapRouter), amount1);
+        TestERC20(token0).approve(address(swapRouter), amount0);
+        TestERC20(token1).approve(address(swapRouter), amount1);
     }
 
     // TODO: execute swap() declared in HookTest.sol
