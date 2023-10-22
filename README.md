@@ -88,3 +88,7 @@ npx ts-node src/server.ts
 cd frontend
 npm run dev
 ```
+
+## deployedContract
+- Scrolls:
+   - https://sepolia.scrollscan.dev/address/0x80e491E5d9Fa0503306b4496E9440816Bf56d14c#code 

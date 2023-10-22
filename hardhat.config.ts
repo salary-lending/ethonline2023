@@ -55,7 +55,18 @@ const config: HardhatUserConfig = {
       // polygon
       polygon: process.env.POLYSCAN_API_KEY || "",
       polygonMumbai: process.env.POLYSCAN_API_KEY || "",
+      scroll_testnet: process.env.SCAN_API_KEY || "",
     },
+    customChains: [
+      {
+          network: "scroll_testnet",
+          chainId: 534351,
+          urls: {
+              apiURL: "https://api-sepolia.scrollscan.com/api",
+              browserURL: "https://sepolia.scrollscan.dev/"
+          }
+      }
+    ]
   },
   networks: {
     // testnets
@@ -91,6 +102,21 @@ const config: HardhatUserConfig = {
       url: "http://127.0.0.1:8545",
 
     },
+      mantle_testnet: {
+        url: "https://rpc.testnet.mantle.xyz",
+        accounts: [
+            process.env.PRIVATE_KEY ?? ""
+        ]
+    },
+    scroll_testnet: {
+        // 8000000000
+        gas: 1200000, 
+
+        url: "https://scroll-sepolia.blockpi.network/v1/rpc/public",
+        accounts: [
+            process.env.PRIVATE_KEY ?? ""
+        ]
+    }
   },
   baseURIs,
   proxies,
