@@ -37,8 +37,8 @@ const invoiceMinterContract = new ethers.Contract(
 
 enum InvoiceStatus {
   None = 0,
-  Financed,
-  Paid,
+  Financed = 1,
+  Paid = 2,
 }
 
 function getStatusString(statusNumber: number): string {

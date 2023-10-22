@@ -19,6 +19,16 @@ const db = new Database({
 });
 let invoiceTable, buffer1, roles, registry, dai, usdc;
 
+enum InvoiceStatus {
+  None = 0,
+  Financed = 1,
+  Paid = 2,
+}
+
+function getStatusString(statusNumber: number): string {
+  return InvoiceStatus[statusNumber];
+}
+
 before(async function () {
   this.timeout(25000);
   console.log("Starting LocalTableland");
@@ -124,7 +134,7 @@ describe("InvoiceFinancer", function () {
       console.log("invoicePre", invoicePre);
       const invoiceDetails = await invoiceFinancer.invoices("INV001");
       const status = invoiceDetails.status; // This will give you a number representing the status.
-      console.log("status", status);
+      console.log("status", getStatusString(status));
 
       await invoiceFinancer.connect(addr2).payInvoice("INV001", paymentAmount);
 
@@ -132,7 +142,7 @@ describe("InvoiceFinancer", function () {
       console.log("invoice", invoice);
       const invoiceDetailsPost = await invoiceFinancer.invoices("INV001");
       const statusPost = invoiceDetailsPost.status; // This will give you a number representing the status.
-      console.log("statusPost", statusPost);
+      console.log("statusPost", getStatusString(statusPost));
 
       const balance = await invoiceToken.balanceOf(addr2.address);
       const afterTokenBalance = await invoiceToken.totalSupply();
