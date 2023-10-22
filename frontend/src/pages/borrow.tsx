@@ -76,7 +76,6 @@ const BorrowPage = () => {
       });
       toast.success("Approve Success");
       // 10 sec st for confirmation of approve transaction
-      await waitForConfirmation(1000*20)
       
       const borrowTx = await _borrow({
         args: [DAI_ADDRESS, parseUnits(borrowAmount.toString(), 18)],

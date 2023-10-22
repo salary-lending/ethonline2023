@@ -77,12 +77,14 @@ const SwapPage = (props: Props) => {
         throw new Error("Insufficient balance")
       }
       setProcessing(true);
-      await _approveUsdc({args:[address, parseUnits(amount.toString(),18)]})
-      // await _approveUsdc({args:[ARRANGER_CONDUIT_ADDRESS,parseUnits(amount.toString(),18)]})
+      // await _approveUsdc({args:[address, parseUnits(amount.toString(),18)]})
+      // await _approveUsdc({args:[STRATEGY_MANAGER_ADDRESS,parseUnits(amount.toString(),18)]})
+      // await _approveUsdc({args:[address, parseUnits(amount.toString(),18)]})
       
       const swapTx = await _swapUsdc({
         args: [parseUnits(amount.toString(), 18)],
       });
+      
       console.log({ swapTx });
       setTxHash(swapTx.hash);
       toast.success("Swap successful");

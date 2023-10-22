@@ -17,7 +17,7 @@ type Props = {};
 const MintPage = (props: Props) => {
   const [apiKey, setApiKey] = useState("");
   const [isFetching, setIsFetching] = useState(false);
-  const [invoices, setInvoices] = useState<InvoiceType[]>(DEEL_TEST_INVOICES);
+  const [invoices, setInvoices] = useState<InvoiceType[]>([]);
   const {address} = useAccount()
 
   const {data:mintedInvoices} = useContractRead({
@@ -27,15 +27,11 @@ const MintPage = (props: Props) => {
   })
 
 
-  useEffect(()=>{
-    console.log({mintedInvoices})
-  },[mintedInvoices])
 
   const connectDeel = async () => {
     try { 
       setIsFetching(true)
-
-      const res = await axios.get(`${API_URL}/invoices/deel`)
+      const res = await axios.get(`${API_URL}/deel/invoice`)
       console.log(res.data)
       setInvoices(res.data.data)
     } catch (err) {
@@ -57,6 +53,7 @@ const MintPage = (props: Props) => {
               apiKey={apiKey}
               setApiKey={setApiKey}
               handleSubmit={connectDeel}
+              isFetching={isFetching}
             />
           </CardBody>
         </Card>
