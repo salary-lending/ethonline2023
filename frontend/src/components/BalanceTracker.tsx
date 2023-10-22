@@ -14,7 +14,7 @@ const BalanceTracker = (props: Props) => {
       <CardBody>
         <h6 className="font-bold font-heading text-default-500">Balances</h6>
         <div className="flex flex-wrap mt-2 gap-3">
-          <div className="bg-default-100 border border-default-200/50 w-full p-3 rounded-xl">
+          <div className="bg-default-100 shadow-small border border-default-200/50 w-full p-3 rounded-xl">
             <p className="font-medium text-default-500 font-heading">
               Invoice Token
             </p>
@@ -26,7 +26,7 @@ const BalanceTracker = (props: Props) => {
             </p>
           </div>
 
-        <div className="bg-default-100 border border-default-200/50 w-full p-3 rounded-xl">
+        <div className="bg-default-100 border shadow-small border-default-200/50 w-full p-3 rounded-xl">
             <p className="font-medium text-default-500 font-heading">
               Dai Token
             </p>
@@ -35,7 +35,7 @@ const BalanceTracker = (props: Props) => {
             </p>
           </div>
 
-          <div className="bg-default-100 border border-default-200/50 w-full p-3 rounded-xl">
+          <div className="bg-default-100 border shadow-small border-default-200/50 w-full p-3 rounded-xl">
             <p className="font-medium text-default-500 font-heading">
               Usdc Token
             </p>

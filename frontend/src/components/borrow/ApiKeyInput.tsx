@@ -17,6 +17,7 @@ const ApiKeyInput = ({apiKey,setApiKey,handleSubmit,isFetching=false}: Props) =>
         onChange={(e) => setApiKey(e.target.value)}
         startContent={<AiOutlineApi className="text-xl text-zinc-400" />}
         radius="lg"
+        variant="faded"
         size="lg"
         value={apiKey}
         placeholder="Paste your deel api key here ..."

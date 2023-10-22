@@ -134,6 +134,7 @@ const RepayPage = (props: Props) => {
                 Repay borrowed dai tokens
               </p>
               <Select
+              variant="faded"
                 label="Select Invoice to Repay"
                 placeholder="Select Invoice to repay"
                 className="max-w-xs mt-4"

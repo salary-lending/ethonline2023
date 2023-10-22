@@ -77,14 +77,13 @@ const SwapPage = (props: Props) => {
         throw new Error("Insufficient balance")
       }
       setProcessing(true);
-      // await _approveUsdc({args:[address, parseUnits(amount.toString(),18)]})
-      // await _approveUsdc({args:[STRATEGY_MANAGER_ADDRESS,parseUnits(amount.toString(),18)]})
-      // await _approveUsdc({args:[address, parseUnits(amount.toString(),18)]})
+
+      await _approveDai({args:[STRATEGY_MANAGER_ADDRESS,parseUnits(amount.toString(),18)]})
       
       const swapTx = await _swapUsdc({
         args: [parseUnits(amount.toString(), 18)],
       });
-      
+
       console.log({ swapTx });
       setTxHash(swapTx.hash);
       toast.success("Swap successful");
@@ -115,8 +114,7 @@ const SwapPage = (props: Props) => {
         throw new Error("Insufficient balance")
       }
 
-      // await _approveDai({args:[STRATEGY_MANAGER_ADDRESS, parseUnits(amount.toString(),18)]})
-      // await _approveUsdc({args:[, parseUnits(amount.toString(),18)]})
+      await _approveUsdc({args:[STRATEGY_MANAGER_ADDRESS,parseUnits(amount.toString(),18)]})
 
       const swapTx = await _swapDai({
         args: [parseUnits(amount.toString(), 18)],
@@ -168,8 +166,8 @@ const SwapPage = (props: Props) => {
               <Tab key="dai-usdc" title="DAI to USDC" className="font-medium" />
             </Tabs>
           </div>
-          <div className="flex justify-between mt-4 gap-4 items-center ">
-            <div className="bg-default-100 p-3 px-5 rounded-xl">
+          <div className="flex justify-between  mt-4 gap-4 items-center ">
+            <div className="bg-default-100 p-3 shadow-small px-5 rounded-xl">
               <p className="text-default-500">You Supply</p>
               <p className="uppercase text-2xl font-heading font-semibold">
                 {state.from}
@@ -178,7 +176,7 @@ const SwapPage = (props: Props) => {
             <div>
               <TbArrowRight className="text-6xl animate-pulse" />
             </div>
-            <div className="bg-default-100 p-3 px-5 rounded-xl">
+            <div className="bg-default-100 shadow-small p-3 px-5 rounded-xl">
               <p className="text-default-500">You Recieve</p>
               <p className="uppercase text-2xl font-heading font-semibold">
                 {state.to}
@@ -193,9 +191,10 @@ const SwapPage = (props: Props) => {
             type="number"
             placeholder={`Enter ${state.from} amount `}
             size="lg"
+            variant="faded"
             className="mt-4"
             classNames={{
-              input: "text-xl font-medium p-4",
+              input: "text-xl font-medium",
               inputWrapper: "h-16",
             }}
           />
