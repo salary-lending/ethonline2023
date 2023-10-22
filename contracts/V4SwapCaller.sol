@@ -3,27 +3,80 @@ pragma solidity ^0.8.19;
 
 import "forge-std/Test.sol";
 
+import {GasSnapshot} from "forge-gas-snapshot/GasSnapshot.sol";
+import {Deployers} from "@uniswap/v4-core/test/foundry-tests/utils/Deployers.sol";
 import {PoolManager} from "@uniswap/v4-core/contracts/PoolManager.sol";
 import {IPoolManager} from "@uniswap/v4-core/contracts/interfaces/IPoolManager.sol";
 import {PoolKey} from "@uniswap/v4-core/contracts/types/PoolKey.sol";
-import {PoolModifyPositionTest} from "@uniswap/v4-core/contracts/test/PoolModifyPositionTest.sol";
-import {PoolSwapTest} from "@uniswap/v4-core/contracts/test/PoolSwapTest.sol";
-
 import {ERC20} from "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import {TickMath} from "@uniswap/v4-core/contracts/libraries/TickMath.sol";
 
-contract V4SwapCaller is Test{
-    PoolManager poolManager;
-    PoolModifyPositionTest modifyPositionRouter;
-    PoolSwapTest swapRouter;
+import {CurrencyLibrary, Currency} from "@uniswap/v4-core/contracts/types/Currency.sol";
+import {PoolId, PoolIdLibrary} from "@uniswap/v4-core/contracts/types/PoolId.sol";
+import {IHooks} from "@uniswap/v4-core/contracts/interfaces/IHooks.sol";
+import {Hooks} from "@uniswap/v4-core/contracts/libraries/Hooks.sol";
+import {PoolModifyPositionTest} from "@uniswap/v4-core/contracts/test/PoolModifyPositionTest.sol";
+import {PoolSwapTest} from "@uniswap/v4-core/contracts/test/PoolSwapTest.sol";
 
-    uint160 public constant MIN_PRICE_LIMIT = TickMath.MIN_SQRT_RATIO + 1;
-    uint160 public constant MAX_PRICE_LIMIT = TickMath.MAX_SQRT_RATIO - 1;
+import {HookTest} from "./swapTest/swapUtils/HookTest.sol";
+import {HookMiner} from "./swapTest/swapUtils/HookMiner.sol";
+import {VerifierHook} from "./VerifierHook.sol";
 
-    function init(address token0, address token1, uint256 amount0, uint256 amount1) public {
-        poolManager = new PoolManager(500000);
-        modifyPositionRouter = new PoolModifyPositionTest(IPoolManager(address(poolManager)));
-        swapRouter = new PoolSwapTest(IPoolManager(address(poolManager)));
+
+// @notice: Usage of V4SwapCaller: same in VerifierHookTest
+// For operation test, run  setup()
+
+contract V4SwapCaller is HookTest, Deployers, GasSnapshot{
+    using PoolIdLibrary for PoolKey;
+    using CurrencyLibrary for Currency;
+
+    VerifierHook verifierHook;
+    PoolKey poolKey;
+    PoolId poolId;
+
+    error InvalidSwapAmount();
+
+    function setUp() public {
+        // creates the pool manager, test tokens, and other utility routers
+        HookTest.initHookTestEnv();
+
+        // Deploy the hook to an address with the correct flags
+        uint160 flags = uint160(
+            Hooks.BEFORE_SWAP_FLAG | Hooks.AFTER_SWAP_FLAG | Hooks.BEFORE_MODIFY_POSITION_FLAG
+                | Hooks.AFTER_MODIFY_POSITION_FLAG
+        );
+        (address hookAddress, bytes32 salt) =
+            HookMiner.find(address(this), flags, 0, type(VerifierHook).creationCode, abi.encode(address(manager)));
+        verifierHook = new VerifierHook{salt: salt}(IPoolManager(address(manager)));
+        require(address(verifierHook) == hookAddress, "VerifierHookTest: hook address mismatch");
+
+        // Create the pool
+        // token0, token1 is declared in HookTest.sol
+        // PoolKey params:
+        // - The lower currency
+        // - The higher currency
+        // - The pool swap fee
+        // - Ticks
+        // - Hook
+        poolKey = PoolKey(Currency.wrap(address(token0)), Currency.wrap(address(token1)), 3000, 60, IHooks(verifierHook));
+        poolId = poolKey.toId();
+        manager.initialize(poolKey, SQRT_RATIO_1_1, "");
+
+        // @notice: Provide liquidity to the pool
+        // params of ModifyPositionParams: 
+        // - tickLower
+        // - tickUpper
+        // - liquidityDelta <- Initial pool liquidity
+
+        // Todo: why calls 3 times!??
+        modifyPositionRouter.modifyPosition(poolKey, IPoolManager.ModifyPositionParams(-60, 60, 10 ether), "");
+        modifyPositionRouter.modifyPosition(poolKey, IPoolManager.ModifyPositionParams(-120, 120, 10 ether), "");
+        // the lower and upper tick of the position
+        modifyPositionRouter.modifyPosition(
+            poolKey,
+            IPoolManager.ModifyPositionParams(TickMath.minUsableTick(60), TickMath.maxUsableTick(60), 10 ether),
+            ""
+        );
     }
 
     function approve(address token0, address token1, uint256 amount0, uint256 amount1) internal {
@@ -31,16 +84,12 @@ contract V4SwapCaller is Test{
         ERC20(token1).approve(address(swapRouter), amount1);
     }
 
-    function swap(PoolKey memory key, int256 amountSpecified, bool zeroForOne, bytes memory hookData) internal {
-        IPoolManager.SwapParams memory params = IPoolManager.SwapParams({
-            zeroForOne: zeroForOne,
-            amountSpecified: amountSpecified,
-            sqrtPriceLimitX96: zeroForOne ? MIN_PRICE_LIMIT : MAX_PRICE_LIMIT // unlimited impact
-        });
+    // TODO: execute swap() declared in HookTest.sol
+    function executeSwap(int256 _amount)public {
+        if(_amount > 0) revert InvalidSwapAmount();
+        int256 amount = 100; // which amount?
+        bool zeroForOne = true;
 
-        PoolSwapTest.TestSettings memory testSettings =
-            PoolSwapTest.TestSettings({withdrawTokens: true, settleUsingTransfer: true});
-
-        swapRouter.swap(key, params, testSettings, hookData);
+        swap(poolKey, amount, zeroForOne, "");
     }
 }
